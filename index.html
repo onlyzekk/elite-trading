@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#08150F">
+  <meta name="description" content="Elite Trading — Nigeria's trusted crypto exchange. Buy and sell USDT, BTC, ETH, BNB.">
+  <title>Elite Trading</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     SPLASH
+════════════════════════════════════════ -->
+<div id="splash">
+  <div style="width:220px;" data-logo="220"></div>
+  <div class="splash-bar-track">
+    <div id="splash-fill" class="splash-bar-fill"></div>
+  </div>
+  <div class="splash-label">LOADING</div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TOAST
+════════════════════════════════════════ -->
+<div id="toast"></div>
+
+<div class="app">
+
+<!-- ════════════════════════════════════════
+     LOGIN
+════════════════════════════════════════ -->
+<div id="login" class="page">
+  <div class="auth-wrap">
+    <div class="auth-logo" data-logo="180"></div>
+    <div class="auth-card">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to your account</div>
+      <div class="field">
+        <label>Email address</label>
+        <input id="login-email" type="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div id="login-err" style="font-size:13px;color:var(--danger);margin-bottom:12px;min-height:16px;"></div>
+      <button class="btn btn-primary" onclick="doLogin()">Sign in</button>
+      <div class="info-box" style="margin-top:14px;margin-bottom:0;">
+        <strong>Demo admin:</strong> admin@elitetrading.com / Admin@2025<br>
+        <strong>Demo user:</strong> demo@user.com / Demo@2025
+      </div>
+    </div>
+    <div class="auth-switch">Don't have an account? <a onclick="show('register')">Create one</a></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     REGISTER
+════════════════════════════════════════ -->
+<div id="register" class="page">
+  <div class="auth-wrap">
+    <div class="auth-logo" data-logo="180"></div>
+    <div class="auth-card">
+      <div class="auth-title">Create account</div>
+      <div class="auth-sub">Join Elite Trading today</div>
+      <div class="field">
+        <label>Full name</label>
+        <input id="reg-name" type="text" placeholder="e.g. Adaeze Okonkwo" autocomplete="name">
+      </div>
+      <div class="field">
+        <label>Email address</label>
+        <input id="reg-email" type="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input id="reg-pass" type="password" placeholder="Min. 6 characters" autocomplete="new-password">
+      </div>
+      <div class="field">
+        <label>Confirm password</label>
+        <input id="reg-pass2" type="password" placeholder="Re-enter password" autocomplete="new-password">
+      </div>
+      <div id="reg-err" style="font-size:13px;color:var(--danger);margin-bottom:12px;min-height:16px;"></div>
+      <button class="btn btn-primary" onclick="doRegister()">Create account</button>
+    </div>
+    <div class="auth-switch">Already have an account? <a onclick="show('login')">Sign in</a></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ADMIN — HOME
+════════════════════════════════════════ -->
+<div id="admin-home" class="page">
+  <div class="topbar">
+    <div data-logo="130"></div>
+    <div class="topbar-actions">
+      <div class="icon-btn" onclick="show('admin-orders'); renderAdminOrders();">
+        <i class="ti ti-bell"></i>
+        <span class="notif-dot"></span>
+      </div>
+      <div class="icon-btn" onclick="doLogout()"><i class="ti ti-logout"></i></div>
+    </div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="metric-label">Today's orders</div>
+      <div class="metric-val">12</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Pending</div>
+      <div class="metric-val warn" id="adm-pending">0</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Volume (NGN)</div>
+      <div class="metric-val teal" id="adm-volume">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Your spread</div>
+      <div class="metric-val" id="adm-spread">2%</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div class="card-title" style="margin:0;">Live rates</div>
+      <div style="font-size:11px;color:var(--text-3);" id="last-updated">
+        <span class="pulse">Updating...</span>
+      </div>
+    </div>
+    <div id="admin-rates"></div>
+  </div>
+
+  <button class="btn btn-outline" onclick="show('admin-spread'); renderSpreadPreview();">
+    <i class="ti ti-adjustments"></i> Adjust spread & rates
+  </button>
+
+  <div class="bottom-nav">
+    <div class="bnav-item active" onclick="renderAdminHome(); show('admin-home');">
+      <i class="ti ti-layout-dashboard"></i><span>Dashboard</span>
+    </div>
+    <div class="bnav-item" onclick="renderAdminOrders(); show('admin-orders');">
+      <i class="ti ti-list-check"></i><span>Orders</span>
+    </div>
+    <div class="bnav-item" onclick="renderAdminUsers(); show('admin-users');">
+      <i class="ti ti-users"></i><span>Users</span>
+    </div>
+    <div class="bnav-item" onclick="renderAdminRecords(); show('admin-records');">
+      <i class="ti ti-chart-bar"></i><span>Records</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ADMIN — SPREAD
+════════════════════════════════════════ -->
+<div id="admin-spread" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('admin-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Spread & rates</div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div class="card-title" style="margin:0;">Your spread</div>
+      <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:var(--teal);" id="spread-display">2%</div>
+    </div>
+    <input type="range" id="spread-val" min="0.5" max="10" step="0.5" value="2" oninput="updateSpread()">
+    <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--text-3);">
+      <span>0.5%</span><span>10%</span>
+    </div>
+  </div>
+
+  <div class="section-label">Rate preview</div>
+  <div id="spread-preview"></div>
+
+  <button class="btn btn-primary" onclick="toast('Spread saved ✓'); show('admin-home'); renderAdminHome();">
+    <i class="ti ti-check"></i> Save & apply
+  </button>
+</div>
+
+<!-- ════════════════════════════════════════
+     ADMIN — ORDERS
+════════════════════════════════════════ -->
+<div id="admin-orders" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('admin-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Orders</div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab-btn active" data-filter="all"       onclick="renderAdminOrders('all')">All</div>
+    <div class="tab-btn"       data-filter="pending"    onclick="renderAdminOrders('pending')">Pending</div>
+    <div class="tab-btn"       data-filter="completed"  onclick="renderAdminOrders('completed')">Completed</div>
+    <div class="tab-btn"       data-filter="rejected"   onclick="renderAdminOrders('rejected')">Rejected</div>
+  </div>
+  <div id="orders-list"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ADMIN — ORDER DETAIL
+════════════════════════════════════════ -->
+<div id="admin-order-detail" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('admin-orders')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Order detail</div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;" id="od-title"></div>
+      <span id="od-badge" class="badge"></span>
+    </div>
+    <div class="rate-row" style="padding:8px 0;">
+      <span style="font-size:13px;color:var(--text-3);">User</span>
+      <span style="font-size:14px;font-weight:500;" id="od-user"></span>
+    </div>
+    <div class="rate-row" style="padding:8px 0;">
+      <span style="font-size:13px;color:var(--text-3);">Email</span>
+      <span style="font-size:13px;" id="od-email"></span>
+    </div>
+    <div class="rate-row" style="padding:8px 0;">
+      <span style="font-size:13px;color:var(--text-3);">NGN amount</span>
+      <span style="font-size:14px;font-weight:600;color:var(--teal);" id="od-amount"></span>
+    </div>
+    <div class="rate-row" style="padding:8px 0;border:none;">
+      <span style="font-size:13px;color:var(--text-3);">Time</span>
+      <span style="font-size:13px;" id="od-time"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Payment proof</div>
+    <div style="background:var(--dark-3);border-radius:var(--radius-sm);padding:16px;text-align:center;border:0.5px solid var(--border-2);">
+      <i class="ti ti-file-description" style="font-size:36px;color:var(--text-3);display:block;margin-bottom:8px;"></i>
+      <div style="font-size:13px;color:var(--text-2);" id="od-proof"></div>
+    </div>
+  </div>
+
+  <div id="od-actions" style="display:flex;gap:10px;margin-top:4px;"></div>
+  <div style="font-size:12px;color:var(--text-3);margin-top:10px;">
+    After confirming, manually send crypto to the user's wallet and mark complete.
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ADMIN — USERS
+════════════════════════════════════════ -->
+<div id="admin-users" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('admin-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Users</div>
+  </div>
+
+  <div class="metric-grid" style="margin-bottom:16px;">
+    <div class="metric-card"><div class="metric-label">Registered</div><div class="metric-val">24</div></div>
+    <div class="metric-card"><div class="metric-label">KYC pending</div><div class="metric-val warn">2</div></div>
+  </div>
+
+  <div class="section-label">All users</div>
+  <div class="card">
+    <div id="users-list"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ADMIN — RECORDS
+════════════════════════════════════════ -->
+<div id="admin-records" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('admin-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Trade records</div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-label">Total volume</div><div class="metric-val teal" id="rec-vol">—</div></div>
+    <div class="metric-card"><div class="metric-label">Completed trades</div><div class="metric-val" id="rec-trades">—</div></div>
+    <div class="metric-card"><div class="metric-label">Est. spread earnings</div><div class="metric-val teal" id="rec-earn">—</div></div>
+    <div class="metric-card"><div class="metric-label">Avg trade value</div><div class="metric-val" id="rec-avg">—</div></div>
+  </div>
+
+  <div class="section-label">Breakdown by asset</div>
+  <div class="card"><div id="rec-breakdown"></div></div>
+
+  <div class="info-box">
+    📊 These records are your investor pitch data. Every completed trade is documented here.
+  </div>
+  <button class="btn btn-outline" onclick="toast('Export feature coming in v2.0')">
+    <i class="ti ti-file-export"></i> Export as CSV
+  </button>
+</div>
+
+<!-- ════════════════════════════════════════
+     USER — HOME
+════════════════════════════════════════ -->
+<div id="user-home" class="page">
+  <div class="topbar">
+    <div data-logo="130"></div>
+    <div class="topbar-actions">
+      <div class="icon-btn" onclick="doLogout()"><i class="ti ti-logout"></i></div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:16px;">
+    <div style="font-size:13px;color:var(--text-3);">Welcome back</div>
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;" id="user-greeting">—</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;">
+    <button class="btn btn-success" onclick="show('user-buy'); calcBuy();">
+      <i class="ti ti-arrow-down-circle"></i> Buy crypto
+    </button>
+    <button class="btn btn-danger" onclick="show('user-sell'); calcSell();">
+      <i class="ti ti-arrow-up-circle"></i> Sell crypto
+    </button>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div class="card-title" style="margin:0;">Live rates</div>
+      <div style="font-size:11px;color:var(--text-3);" id="last-updated">Updating...</div>
+    </div>
+    <div id="user-rates"></div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="bnav-item active" onclick="renderUserHome(); show('user-home');">
+      <i class="ti ti-home"></i><span>Home</span>
+    </div>
+    <div class="bnav-item" onclick="renderUserOrders(); show('user-orders');">
+      <i class="ti ti-receipt"></i><span>Orders</span>
+    </div>
+    <div class="bnav-item" onclick="show('user-kyc');">
+      <i class="ti ti-user-check"></i><span>KYC</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     USER — BUY
+════════════════════════════════════════ -->
+<div id="user-buy" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('user-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Buy crypto</div>
+  </div>
+
+  <div class="field">
+    <label>Select asset</label>
+    <select id="buy-coin" onchange="calcBuy()">
+      <option value="USDT">USDT — Tether</option>
+      <option value="BTC">BTC — Bitcoin</option>
+      <option value="ETH">ETH — Ethereum</option>
+      <option value="BNB">BNB — BNB Chain</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Amount you're paying (NGN)</label>
+    <input id="buy-ngn" type="number" placeholder="e.g. 50,000" oninput="calcBuy()">
+  </div>
+
+  <div class="calc-result">
+    <div class="calc-label">You will receive</div>
+    <div class="calc-val" id="buy-result-val">—</div>
+    <div class="calc-note" id="buy-result-note"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Payment instructions</div>
+    <div style="font-size:13px;color:var(--text-3);margin-bottom:10px;">Transfer your NGN to:</div>
+    <div style="font-size:15px;font-weight:600;margin-bottom:2px;">Access Bank</div>
+    <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--teal);margin-bottom:2px;">0123456789</div>
+    <div style="font-size:13px;color:var(--text-2);">Elite Trading Ltd</div>
+  </div>
+
+  <div class="warn-box">
+    <i class="ti ti-alert-triangle" style="margin-right:6px;"></i>
+    Crypto is released <strong>only after</strong> your payment is confirmed by admin.
+  </div>
+
+  <div class="proof-box">
+    <i class="ti ti-upload"></i>
+    <p>Tap to upload payment receipt / screenshot</p>
+  </div>
+
+  <button class="btn btn-primary" onclick="submitBuyOrder()">
+    <i class="ti ti-send"></i> Submit buy order
+  </button>
+</div>
+
+<!-- ════════════════════════════════════════
+     USER — SELL
+════════════════════════════════════════ -->
+<div id="user-sell" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('user-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Sell crypto</div>
+  </div>
+
+  <div class="field">
+    <label>Select asset to sell</label>
+    <select id="sell-coin" onchange="calcSell()">
+      <option value="USDT">USDT — Tether</option>
+      <option value="BTC">BTC — Bitcoin</option>
+      <option value="ETH">ETH — Ethereum</option>
+      <option value="BNB">BNB — BNB Chain</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Amount (crypto)</label>
+    <input id="sell-amt" type="number" placeholder="e.g. 100" oninput="calcSell()">
+  </div>
+
+  <div class="calc-result">
+    <div class="calc-label">You will receive</div>
+    <div class="calc-val" id="sell-result-val">—</div>
+    <div class="calc-note" id="sell-result-note"></div>
+  </div>
+
+  <div class="field">
+    <label>Your bank account number</label>
+    <input type="text" placeholder="e.g. 0123456789">
+  </div>
+
+  <div class="field">
+    <label>Bank name</label>
+    <select>
+      <option>Access Bank</option>
+      <option>GTBank</option>
+      <option>First Bank</option>
+      <option>UBA</option>
+      <option>Zenith Bank</option>
+      <option>Opay</option>
+      <option>Palmpay</option>
+      <option>Kuda Bank</option>
+      <option>Moniepoint</option>
+    </select>
+  </div>
+
+  <div class="warn-box">
+    <i class="ti ti-alert-triangle" style="margin-right:6px;"></i>
+    Send crypto to admin wallet first. NGN is released only after receipt is confirmed.
+  </div>
+
+  <div class="info-box">
+    Admin wallet address will be provided after you submit your order.
+  </div>
+
+  <button class="btn btn-primary" onclick="submitSellOrder()">
+    <i class="ti ti-send"></i> Submit sell order
+  </button>
+</div>
+
+<!-- ════════════════════════════════════════
+     USER — ORDERS
+════════════════════════════════════════ -->
+<div id="user-orders" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('user-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">My orders</div>
+  </div>
+  <div id="user-orders-list"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     USER — KYC
+════════════════════════════════════════ -->
+<div id="user-kyc" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('user-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">KYC verification</div>
+  </div>
+
+  <div class="info-box">
+    Complete your KYC to unlock higher trading limits. All data is encrypted and secure.
+  </div>
+
+  <div class="card">
+    <div class="step-row">
+      <div class="step-num done"><i class="ti ti-check"></i></div>
+      <div>
+        <div class="step-label">Email verified</div>
+        <div class="step-sub">Completed during registration</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num done"><i class="ti ti-check"></i></div>
+      <div>
+        <div class="step-label">BVN verification</div>
+        <div class="step-sub">Matched via Smile Identity</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-label">NIN & government ID</div>
+        <div class="step-sub">Upload NIN slip, passport or driver's licence</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-label">Selfie verification</div>
+        <div class="step-sub">Hold your ID next to your face</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>BVN</label>
+    <input type="text" placeholder="Enter your 11-digit BVN" maxlength="11">
+  </div>
+
+  <div class="field">
+    <label>NIN</label>
+    <input type="text" placeholder="Enter your NIN" maxlength="11">
+  </div>
+
+  <div class="proof-box">
+    <i class="ti ti-id-badge"></i>
+    <p>Upload government ID (NIN slip, passport or driver's licence)</p>
+  </div>
+
+  <button class="btn btn-primary" onclick="toast('KYC submitted — under review within 24 hours.')">
+    <i class="ti ti-send"></i> Submit for review
+  </button>
+</div>
+
+</div><!-- /app -->
+
+<script src="js/app.js"></script>
+</body>
+</html>
