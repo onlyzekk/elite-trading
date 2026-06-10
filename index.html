@@ -1,0 +1,1300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#08150F">
+  <meta name="description" content="Elite Trading — Nigeria's trusted crypto exchange. Buy and sell USDT, BTC, ETH, BNB.">
+  <title>Elite Trading</title>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --teal:       #00D9B0;
+  --teal-dim:   #00a887;
+  --dark:       #08150F;
+  --dark-2:     #0d1f18;
+  --dark-3:     #132a20;
+  --dark-4:     #1a3829;
+  --surface:    #0f2019;
+  --border:     rgba(0,217,176,.12);
+  --border-2:   rgba(0,217,176,.06);
+  --text-1:     #f0faf7;
+  --text-2:     #8ab5a8;
+  --text-3:     #4d7a6e;
+  --success:    #00D9B0;
+  --danger:     #ff5f5f;
+  --warning:    #f5a623;
+  --radius:     14px;
+  --radius-sm:  8px;
+  --shadow:     0 4px 24px rgba(0,0,0,.4);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; -webkit-tap-highlight-color: transparent; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--dark);
+  color: var(--text-1);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
+
+/* ── SPLASH ── */
+#splash {
+  position: fixed; inset: 0;
+  background: var(--dark);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 0; z-index: 9999;
+  transition: opacity .5s ease, visibility .5s ease;
+}
+#splash.hide { opacity: 0; visibility: hidden; }
+#splash .logo-wrap { width: 220px; }
+.splash-bar-track {
+  width: 56px; height: 2px;
+  background: rgba(0,217,176,.15);
+  border-radius: 4px; overflow: hidden;
+  margin-top: 40px;
+}
+.splash-bar-fill {
+  height: 100%; width: 0%;
+  background: var(--teal);
+  border-radius: 4px;
+  transition: width .05s linear;
+}
+.splash-label {
+  margin-top: 12px;
+  font-size: 10px; letter-spacing: 3px;
+  color: var(--teal); opacity: .4;
+}
+
+/* ── LAYOUT ── */
+.app { max-width: 430px; margin: 0 auto; min-height: 100vh; position: relative; }
+
+.page { display: none; padding: 0 20px 100px; min-height: 100vh; }
+.page.active { display: block; }
+
+/* ── TOP NAV ── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 0 16px;
+  position: sticky; top: 0; z-index: 100;
+  background: var(--dark);
+}
+.topbar-logo { width: 130px; }
+.topbar-actions { display: flex; align-items: center; gap: 12px; }
+.icon-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--surface); border: 0.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; position: relative; color: var(--text-2);
+  font-size: 16px;
+}
+.notif-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #ff5f5f; border: 1.5px solid var(--dark);
+  position: absolute; top: 2px; right: 2px;
+}
+
+/* ── BACK NAV ── */
+.back-nav {
+  display: flex; align-items: center; gap: 10px;
+  padding: 18px 0 14px;
+  border-bottom: 0.5px solid var(--border-2);
+  margin-bottom: 20px;
+}
+.back-btn {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--surface); border: 0.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-2); font-size: 16px;
+  flex-shrink: 0;
+}
+.back-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 600; }
+
+/* ── AUTH PAGES ── */
+.auth-wrap {
+  display: flex; flex-direction: column;
+  align-items: center; padding: 48px 20px 40px;
+  min-height: 100vh;
+}
+.auth-logo { width: 180px; margin-bottom: 36px; }
+.auth-card {
+  width: 100%; background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius); padding: 28px 24px;
+}
+.auth-title { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.auth-sub { font-size: 14px; color: var(--text-2); margin-bottom: 24px; }
+
+/* ── FORM ── */
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 12px; color: var(--text-2); margin-bottom: 6px; letter-spacing: .04em; text-transform: uppercase; }
+.field input, .field select {
+  width: 100%; padding: 12px 14px;
+  background: var(--dark-3); border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--text-1);
+  font-size: 15px; font-family: 'DM Sans', sans-serif;
+  outline: none; transition: border-color .2s;
+}
+.field input:focus, .field select:focus { border-color: var(--teal); }
+.field input::placeholder { color: var(--text-3); }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 13px 20px; border-radius: var(--radius-sm);
+  font-size: 15px; font-family: 'DM Sans', sans-serif; font-weight: 500;
+  cursor: pointer; border: none; transition: all .2s; width: 100%;
+}
+.btn-primary { background: var(--teal); color: var(--dark); }
+.btn-primary:hover { background: var(--teal-dim); }
+.btn-outline { background: transparent; color: var(--teal); border: 1px solid var(--teal); }
+.btn-outline:hover { background: rgba(0,217,176,.08); }
+.btn-danger  { background: rgba(255,95,95,.12); color: var(--danger); border: 0.5px solid rgba(255,95,95,.3); }
+.btn-success { background: rgba(0,217,176,.1);  color: var(--teal);   border: 0.5px solid var(--border); }
+.btn-ghost   { background: var(--surface); color: var(--text-1); border: 0.5px solid var(--border); }
+.btn-sm { padding: 8px 14px; font-size: 13px; width: auto; }
+
+.auth-switch { margin-top: 20px; text-align: center; font-size: 14px; color: var(--text-2); }
+.auth-switch a { color: var(--teal); cursor: pointer; text-decoration: none; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px; margin-bottom: 12px;
+}
+.card-title {
+  font-family: 'Syne', sans-serif; font-size: 13px;
+  font-weight: 600; color: var(--text-2);
+  text-transform: uppercase; letter-spacing: .06em;
+  margin-bottom: 12px;
+}
+
+/* ── METRIC GRID ── */
+.metric-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 16px; }
+.metric-card {
+  background: var(--dark-3); border: 0.5px solid var(--border-2);
+  border-radius: var(--radius-sm); padding: 14px;
+}
+.metric-label { font-size: 11px; color: var(--text-3); letter-spacing: .04em; text-transform: uppercase; margin-bottom: 6px; }
+.metric-val   { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 700; color: var(--text-1); }
+.metric-val.warn { color: var(--warning); }
+.metric-val.teal { color: var(--teal); }
+
+/* ── RATE ROWS ── */
+.rate-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 11px 0; border-bottom: 0.5px solid var(--border-2);
+}
+.rate-row:last-child { border-bottom: none; }
+.coin-pill {
+  display: flex; align-items: center; gap: 10px;
+}
+.coin-icon {
+  width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700;
+}
+.ci-usdt { background:#0d2e22; color:#00D9B0; }
+.ci-btc  { background:#2e1f0a; color:#f7a325; }
+.ci-eth  { background:#1a1a3e; color:#a090f0; }
+.ci-bnb  { background:#2e1a0a; color:#f0b90b; }
+.coin-name  { font-size: 14px; font-weight: 500; }
+.coin-sub   { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+.rate-prices { text-align: right; }
+.rate-buy    { font-size: 12px; color: var(--teal);   margin-bottom: 2px; }
+.rate-sell   { font-size: 12px; color: var(--danger); }
+
+/* ── BADGES ── */
+.badge {
+  display: inline-block; font-size: 11px; font-weight: 500;
+  padding: 3px 9px; border-radius: 20px; letter-spacing: .02em;
+}
+.b-pending   { background: rgba(245,166,35,.12);  color: var(--warning); }
+.b-completed { background: rgba(0,217,176,.12);   color: var(--teal);   }
+.b-rejected  { background: rgba(255,95,95,.12);   color: var(--danger); }
+.b-verified  { background: rgba(0,217,176,.12);   color: var(--teal);   }
+
+/* ── ORDER CARDS ── */
+.order-item {
+  background: var(--dark-3); border: 0.5px solid var(--border-2);
+  border-radius: var(--radius-sm); padding: 14px 16px;
+  margin-bottom: 10px; cursor: pointer;
+  transition: border-color .2s;
+}
+.order-item:hover { border-color: var(--border); }
+.order-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.order-title { font-size: 15px; font-weight: 500; }
+.order-meta  { font-size: 12px; color: var(--text-3); margin-top: 2px; }
+.order-user  { font-size: 12px; color: var(--text-2); }
+
+/* ── TABS ── */
+.tabs { display: flex; border-bottom: 0.5px solid var(--border-2); margin-bottom: 16px; }
+.tab-btn {
+  flex: 1; text-align: center; padding: 10px 8px;
+  font-size: 13px; color: var(--text-3); cursor: pointer;
+  border-bottom: 2px solid transparent; transition: all .2s;
+}
+.tab-btn.active { color: var(--teal); border-bottom-color: var(--teal); font-weight: 500; }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 100%; max-width: 430px;
+  background: var(--dark-2); border-top: 0.5px solid var(--border);
+  display: flex; padding: 10px 0 16px; z-index: 200;
+}
+.bnav-item {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 4px;
+  font-size: 10px; color: var(--text-3); cursor: pointer;
+  transition: color .2s; padding: 2px 0;
+}
+.bnav-item i { font-size: 22px; }
+.bnav-item.active { color: var(--teal); }
+.bnav-item span { letter-spacing: .02em; }
+
+/* ── STEP ROWS ── */
+.step-row {
+  display: flex; align-items: flex-start; gap: 14px;
+  padding: 12px 0; border-bottom: 0.5px solid var(--border-2);
+}
+.step-row:last-child { border-bottom: none; }
+.step-num {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--dark-3); border: 0.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 600; flex-shrink: 0; color: var(--text-2);
+}
+.step-num.done { background: rgba(0,217,176,.12); color: var(--teal); border-color: var(--teal); }
+.step-label { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+.step-sub   { font-size: 12px; color: var(--text-3); }
+
+/* ── PROOF BOX ── */
+.proof-box {
+  border: 0.5px dashed var(--border);
+  border-radius: var(--radius-sm); padding: 20px;
+  text-align: center; cursor: pointer; margin-bottom: 16px;
+  transition: border-color .2s;
+}
+.proof-box:hover { border-color: var(--teal); }
+.proof-box i { font-size: 28px; color: var(--text-3); display: block; margin-bottom: 8px; }
+.proof-box p { font-size: 13px; color: var(--text-3); }
+
+/* ── WARNING BOX ── */
+.warn-box {
+  background: rgba(245,166,35,.08); border: 0.5px solid rgba(245,166,35,.25);
+  border-radius: var(--radius-sm); padding: 10px 12px;
+  font-size: 12px; color: var(--warning); margin-bottom: 14px;
+}
+.info-box {
+  background: rgba(0,217,176,.06); border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm); padding: 10px 12px;
+  font-size: 12px; color: var(--text-2); margin-bottom: 14px;
+}
+
+/* ── CALC RESULT ── */
+.calc-result {
+  background: var(--dark-3); border: 0.5px solid var(--border-2);
+  border-radius: var(--radius-sm); padding: 16px;
+  margin-bottom: 16px;
+}
+.calc-label { font-size: 12px; color: var(--text-3); margin-bottom: 6px; }
+.calc-val   { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; color: var(--teal); }
+.calc-note  { font-size: 12px; color: var(--text-3); margin-top: 4px; }
+
+/* ── DIVIDER ── */
+.divider { border: none; border-top: 0.5px solid var(--border-2); margin: 16px 0; }
+
+/* ── SECTION LABEL ── */
+.section-label {
+  font-size: 11px; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: .06em;
+  margin-bottom: 10px; margin-top: 4px;
+}
+
+/* ── TOAST ── */
+#toast {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%);
+  background: var(--dark-4); border: 0.5px solid var(--border);
+  border-radius: 30px; padding: 10px 20px;
+  font-size: 13px; color: var(--text-1);
+  opacity: 0; pointer-events: none;
+  transition: opacity .3s; z-index: 9999;
+  white-space: nowrap;
+}
+#toast.show { opacity: 1; }
+
+/* ── SPREAD SLIDER ── */
+input[type=range] {
+  -webkit-appearance: none; width: 100%; height: 4px;
+  background: var(--dark-3); border-radius: 4px; outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 20px; height: 20px;
+  border-radius: 50%; background: var(--teal); cursor: pointer;
+  border: 3px solid var(--dark);
+}
+
+/* ── USER TABLE ── */
+.user-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 11px 0; border-bottom: 0.5px solid var(--border-2);
+}
+.user-row:last-child { border-bottom: none; }
+.user-name { font-size: 14px; font-weight: 500; }
+.user-sub  { font-size: 11px; color: var(--text-3); margin-top: 2px; }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp .4s ease forwards; }
+
+@keyframes pulse {
+  0%,100% { opacity: 1; } 50% { opacity: .5; }
+}
+.pulse { animation: pulse 1.5s ease infinite; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+</style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     SPLASH
+════════════════════════════════════════ -->
+<div id="splash">
+  <div style="width:220px;" data-logo="220"></div>
+  <div class="splash-bar-track">
+    <div id="splash-fill" class="splash-bar-fill"></div>
+  </div>
+  <div class="splash-label">LOADING</div>
+</div>
+
+<!-- ════════════════════════════════════════
+     TOAST
+════════════════════════════════════════ -->
+<div id="toast"></div>
+
+<div class="app">
+
+<!-- ════════════════════════════════════════
+     LOGIN
+════════════════════════════════════════ -->
+<div id="login" class="page">
+  <div class="auth-wrap">
+    <div class="auth-logo" data-logo="180"></div>
+    <div class="auth-card">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to your account</div>
+      <div class="field">
+        <label>Email address</label>
+        <input id="login-email" type="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div id="login-err" style="font-size:13px;color:var(--danger);margin-bottom:12px;min-height:16px;"></div>
+      <button class="btn btn-primary" onclick="doLogin()">Sign in</button>
+
+    </div>
+    <div class="auth-switch">Don't have an account? <a onclick="show('register')">Create one</a></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     REGISTER
+════════════════════════════════════════ -->
+<div id="register" class="page">
+  <div class="auth-wrap">
+    <div class="auth-logo" data-logo="180"></div>
+    <div class="auth-card">
+      <div class="auth-title">Create account</div>
+      <div class="auth-sub">Join Elite Trading today</div>
+      <div class="field">
+        <label>Full name</label>
+        <input id="reg-name" type="text" placeholder="e.g. Chidi Okafor" autocomplete="name">
+      </div>
+      <div class="field">
+        <label>Email address</label>
+        <input id="reg-email" type="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input id="reg-pass" type="password" placeholder="Min. 6 characters" autocomplete="new-password">
+      </div>
+      <div class="field">
+        <label>Confirm password</label>
+        <input id="reg-pass2" type="password" placeholder="Re-enter password" autocomplete="new-password">
+      </div>
+      <div id="reg-err" style="font-size:13px;color:var(--danger);margin-bottom:12px;min-height:16px;"></div>
+      <button class="btn btn-primary" onclick="doRegister()">Create account</button>
+    </div>
+    <div class="auth-switch">Already have an account? <a onclick="show('login')">Sign in</a></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ADMIN — HOME
+════════════════════════════════════════ -->
+<div id="admin-home" class="page">
+  <div class="topbar">
+    <div data-logo="130"></div>
+    <div class="topbar-actions">
+      <div class="icon-btn" onclick="show('admin-orders'); renderAdminOrders();">
+        <i class="ti ti-bell"></i>
+        <span class="notif-dot"></span>
+      </div>
+      <div class="icon-btn" onclick="doLogout()"><i class="ti ti-logout"></i></div>
+    </div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="metric-label">Today's orders</div>
+      <div class="metric-val" id="adm-orders">0</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Pending</div>
+      <div class="metric-val warn" id="adm-pending">0</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Volume (NGN)</div>
+      <div class="metric-val teal" id="adm-volume">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Your spread</div>
+      <div class="metric-val" id="adm-spread">2%</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div class="card-title" style="margin:0;">Live rates</div>
+      <div style="font-size:11px;color:var(--text-3);" id="last-updated">
+        <span class="pulse">Updating...</span>
+      </div>
+    </div>
+    <div id="admin-rates"></div>
+  </div>
+
+  <button class="btn btn-outline" onclick="show('admin-spread'); renderSpreadPreview();">
+    <i class="ti ti-adjustments"></i> Adjust spread & rates
+  </button>
+
+  <div class="bottom-nav">
+    <div class="bnav-item active" onclick="renderAdminHome(); show('admin-home');">
+      <i class="ti ti-layout-dashboard"></i><span>Dashboard</span>
+    </div>
+    <div class="bnav-item" onclick="renderAdminOrders(); show('admin-orders');">
+      <i class="ti ti-list-check"></i><span>Orders</span>
+    </div>
+    <div class="bnav-item" onclick="renderAdminUsers(); show('admin-users');">
+      <i class="ti ti-users"></i><span>Users</span>
+    </div>
+    <div class="bnav-item" onclick="renderAdminRecords(); show('admin-records');">
+      <i class="ti ti-chart-bar"></i><span>Records</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ADMIN — SPREAD
+════════════════════════════════════════ -->
+<div id="admin-spread" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('admin-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Spread & rates</div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div class="card-title" style="margin:0;">Your spread</div>
+      <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:var(--teal);" id="spread-display">2%</div>
+    </div>
+    <input type="range" id="spread-val" min="0.5" max="10" step="0.5" value="2" oninput="updateSpread()">
+    <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--text-3);">
+      <span>0.5%</span><span>10%</span>
+    </div>
+  </div>
+
+  <div class="section-label">Rate preview</div>
+  <div id="spread-preview"></div>
+
+  <button class="btn btn-primary" onclick="toast('Spread saved ✓'); show('admin-home'); renderAdminHome();">
+    <i class="ti ti-check"></i> Save & apply
+  </button>
+</div>
+
+<!-- ════════════════════════════════════════
+     ADMIN — ORDERS
+════════════════════════════════════════ -->
+<div id="admin-orders" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('admin-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Orders</div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab-btn active" data-filter="all"       onclick="renderAdminOrders('all')">All</div>
+    <div class="tab-btn"       data-filter="pending"    onclick="renderAdminOrders('pending')">Pending</div>
+    <div class="tab-btn"       data-filter="completed"  onclick="renderAdminOrders('completed')">Completed</div>
+    <div class="tab-btn"       data-filter="rejected"   onclick="renderAdminOrders('rejected')">Rejected</div>
+  </div>
+  <div id="orders-list"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ADMIN — ORDER DETAIL
+════════════════════════════════════════ -->
+<div id="admin-order-detail" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('admin-orders')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Order detail</div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;" id="od-title"></div>
+      <span id="od-badge" class="badge"></span>
+    </div>
+    <div class="rate-row" style="padding:8px 0;">
+      <span style="font-size:13px;color:var(--text-3);">User</span>
+      <span style="font-size:14px;font-weight:500;" id="od-user"></span>
+    </div>
+    <div class="rate-row" style="padding:8px 0;">
+      <span style="font-size:13px;color:var(--text-3);">Email</span>
+      <span style="font-size:13px;" id="od-email"></span>
+    </div>
+    <div class="rate-row" style="padding:8px 0;">
+      <span style="font-size:13px;color:var(--text-3);">NGN amount</span>
+      <span style="font-size:14px;font-weight:600;color:var(--teal);" id="od-amount"></span>
+    </div>
+    <div class="rate-row" style="padding:8px 0;border:none;">
+      <span style="font-size:13px;color:var(--text-3);">Time</span>
+      <span style="font-size:13px;" id="od-time"></span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Payment proof</div>
+    <div style="background:var(--dark-3);border-radius:var(--radius-sm);padding:16px;text-align:center;border:0.5px solid var(--border-2);">
+      <i class="ti ti-file-description" style="font-size:36px;color:var(--text-3);display:block;margin-bottom:8px;"></i>
+      <div style="font-size:13px;color:var(--text-2);" id="od-proof"></div>
+    </div>
+  </div>
+
+  <div id="od-actions" style="display:flex;gap:10px;margin-top:4px;"></div>
+  <div style="font-size:12px;color:var(--text-3);margin-top:10px;">
+    After confirming, manually send crypto to the user's wallet and mark complete.
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ADMIN — USERS
+════════════════════════════════════════ -->
+<div id="admin-users" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('admin-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Users</div>
+  </div>
+
+  <div class="metric-grid" style="margin-bottom:16px;">
+    <div class="metric-card"><div class="metric-label">Registered</div><div class="metric-val" id="adm-registered">0</div></div>
+    <div class="metric-card"><div class="metric-label">KYC pending</div><div class="metric-val warn" id="adm-kyc-pending">0</div></div>
+  </div>
+
+  <div class="section-label">All users</div>
+  <div class="card">
+    <div id="users-list"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     ADMIN — RECORDS
+════════════════════════════════════════ -->
+<div id="admin-records" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('admin-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Trade records</div>
+  </div>
+
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-label">Total volume</div><div class="metric-val teal" id="rec-vol">—</div></div>
+    <div class="metric-card"><div class="metric-label">Completed trades</div><div class="metric-val" id="rec-trades">—</div></div>
+    <div class="metric-card"><div class="metric-label">Est. spread earnings</div><div class="metric-val teal" id="rec-earn">—</div></div>
+    <div class="metric-card"><div class="metric-label">Avg trade value</div><div class="metric-val" id="rec-avg">—</div></div>
+  </div>
+
+  <div class="section-label">Breakdown by asset</div>
+  <div class="card"><div id="rec-breakdown"></div></div>
+
+  <div class="info-box">
+    📊 These records are your investor pitch data. Every completed trade is documented here.
+  </div>
+  <button class="btn btn-outline" onclick="toast('Export feature coming in v2.0')">
+    <i class="ti ti-file-export"></i> Export as CSV
+  </button>
+</div>
+
+<!-- ════════════════════════════════════════
+     USER — HOME
+════════════════════════════════════════ -->
+<div id="user-home" class="page">
+  <div class="topbar">
+    <div data-logo="130"></div>
+    <div class="topbar-actions">
+      <div class="icon-btn" onclick="doLogout()"><i class="ti ti-logout"></i></div>
+    </div>
+  </div>
+
+  <div style="margin-bottom:16px;">
+    <div style="font-size:13px;color:var(--text-3);">Welcome back</div>
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;" id="user-greeting">—</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;">
+    <button class="btn btn-success" onclick="show('user-buy'); calcBuy();">
+      <i class="ti ti-arrow-down-circle"></i> Buy crypto
+    </button>
+    <button class="btn btn-danger" onclick="show('user-sell'); calcSell();">
+      <i class="ti ti-arrow-up-circle"></i> Sell crypto
+    </button>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div class="card-title" style="margin:0;">Live rates</div>
+      <div style="font-size:11px;color:var(--text-3);" id="last-updated">Updating...</div>
+    </div>
+    <div id="user-rates"></div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="bnav-item active" onclick="renderUserHome(); show('user-home');">
+      <i class="ti ti-home"></i><span>Home</span>
+    </div>
+    <div class="bnav-item" onclick="renderUserOrders(); show('user-orders');">
+      <i class="ti ti-receipt"></i><span>Orders</span>
+    </div>
+    <div class="bnav-item" onclick="show('user-kyc');">
+      <i class="ti ti-user-check"></i><span>KYC</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     USER — BUY
+════════════════════════════════════════ -->
+<div id="user-buy" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('user-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Buy crypto</div>
+  </div>
+
+  <div class="field">
+    <label>Select asset</label>
+    <select id="buy-coin" onchange="calcBuy()">
+      <option value="USDT">USDT — Tether</option>
+      <option value="BTC">BTC — Bitcoin</option>
+      <option value="ETH">ETH — Ethereum</option>
+      <option value="BNB">BNB — BNB Chain</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Amount you're paying (NGN)</label>
+    <input id="buy-ngn" type="number" placeholder="e.g. 50,000" oninput="calcBuy()">
+  </div>
+
+  <div class="calc-result">
+    <div class="calc-label">You will receive</div>
+    <div class="calc-val" id="buy-result-val">—</div>
+    <div class="calc-note" id="buy-result-note"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Payment instructions</div>
+    <div style="font-size:13px;color:var(--text-3);margin-bottom:10px;">Transfer your NGN to:</div>
+    <div style="font-size:15px;font-weight:600;margin-bottom:2px;">Access Bank</div>
+    <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--teal);margin-bottom:2px;">0123456789</div>
+    <div style="font-size:13px;color:var(--text-2);">Elite Trading Ltd</div>
+  </div>
+
+  <div class="warn-box">
+    <i class="ti ti-alert-triangle" style="margin-right:6px;"></i>
+    Crypto is released <strong>only after</strong> your payment is confirmed by admin.
+  </div>
+
+  <div class="proof-box">
+    <i class="ti ti-upload"></i>
+    <p>Tap to upload payment receipt / screenshot</p>
+  </div>
+
+  <button class="btn btn-primary" onclick="submitBuyOrder()">
+    <i class="ti ti-send"></i> Submit buy order
+  </button>
+</div>
+
+<!-- ════════════════════════════════════════
+     USER — SELL
+════════════════════════════════════════ -->
+<div id="user-sell" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('user-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Sell crypto</div>
+  </div>
+
+  <div class="field">
+    <label>Select asset to sell</label>
+    <select id="sell-coin" onchange="calcSell()">
+      <option value="USDT">USDT — Tether</option>
+      <option value="BTC">BTC — Bitcoin</option>
+      <option value="ETH">ETH — Ethereum</option>
+      <option value="BNB">BNB — BNB Chain</option>
+    </select>
+  </div>
+
+  <div class="field">
+    <label>Amount (crypto)</label>
+    <input id="sell-amt" type="number" placeholder="e.g. 100" oninput="calcSell()">
+  </div>
+
+  <div class="calc-result">
+    <div class="calc-label">You will receive</div>
+    <div class="calc-val" id="sell-result-val">—</div>
+    <div class="calc-note" id="sell-result-note"></div>
+  </div>
+
+  <div class="field">
+    <label>Your bank account number</label>
+    <input type="text" placeholder="e.g. 0123456789">
+  </div>
+
+  <div class="field">
+    <label>Bank name</label>
+    <select>
+      <option>Access Bank</option>
+      <option>GTBank</option>
+      <option>First Bank</option>
+      <option>UBA</option>
+      <option>Zenith Bank</option>
+      <option>Opay</option>
+      <option>Palmpay</option>
+      <option>Kuda Bank</option>
+      <option>Moniepoint</option>
+    </select>
+  </div>
+
+  <div class="warn-box">
+    <i class="ti ti-alert-triangle" style="margin-right:6px;"></i>
+    Send crypto to admin wallet first. NGN is released only after receipt is confirmed.
+  </div>
+
+  <div class="info-box">
+    Admin wallet address will be provided after you submit your order.
+  </div>
+
+  <button class="btn btn-primary" onclick="submitSellOrder()">
+    <i class="ti ti-send"></i> Submit sell order
+  </button>
+</div>
+
+<!-- ════════════════════════════════════════
+     USER — ORDERS
+════════════════════════════════════════ -->
+<div id="user-orders" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('user-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">My orders</div>
+  </div>
+  <div id="user-orders-list"></div>
+</div>
+
+<!-- ════════════════════════════════════════
+     USER — KYC
+════════════════════════════════════════ -->
+<div id="user-kyc" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('user-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">KYC verification</div>
+  </div>
+
+  <div class="info-box">
+    Complete your KYC to unlock higher trading limits. All data is encrypted and secure.
+  </div>
+
+  <div class="card">
+    <div class="step-row">
+      <div class="step-num done"><i class="ti ti-check"></i></div>
+      <div>
+        <div class="step-label">Email verified</div>
+        <div class="step-sub">Completed during registration</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num done"><i class="ti ti-check"></i></div>
+      <div>
+        <div class="step-label">BVN verification</div>
+        <div class="step-sub">Matched via Smile Identity</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-label">NIN & government ID</div>
+        <div class="step-sub">Upload NIN slip, passport or driver's licence</div>
+      </div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-label">Selfie verification</div>
+        <div class="step-sub">Hold your ID next to your face</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="field">
+    <label>BVN</label>
+    <input type="text" placeholder="Enter your 11-digit BVN" maxlength="11">
+  </div>
+
+  <div class="field">
+    <label>NIN</label>
+    <input type="text" placeholder="Enter your NIN" maxlength="11">
+  </div>
+
+  <div class="proof-box">
+    <i class="ti ti-id-badge"></i>
+    <p>Upload government ID (NIN slip, passport or driver's licence)</p>
+  </div>
+
+  <button class="btn btn-primary" onclick="toast('KYC submitted — under review within 24 hours.')">
+    <i class="ti ti-send"></i> Submit for review
+  </button>
+</div>
+
+</div><!-- /app -->
+
+<script>
+// ── STATE ──
+const STATE = {
+  user: null,       // { email, name, role:'admin'|'user', kyc:'pending'|'approved' }
+  spread: 2,
+  prices: { USDT:1, BTC:97000, ETH:3500, BNB:680 },
+  orders: [],
+  users: [],
+  priceInterval: null,
+};
+
+// Pre-compute NGN for sample orders
+function initOrderNGN() {
+  STATE.orders.forEach(o => {
+    if (!o.ngn || o.ngn === 0) {
+      o.ngn = Math.round(o.amount * STATE.prices[o.coin] * 1620 * (o.type==='Buy' ? 1 + STATE.spread/100 : 1 - STATE.spread/100));
+    }
+  });
+}
+
+// ── UTILS ──
+const USD_NGN = 1620;
+const $ = id => document.getElementById(id);
+const fmtNGN = n => '₦' + Math.round(n).toLocaleString('en-NG');
+const buyRate  = c => STATE.prices[c] * USD_NGN * (1 - STATE.spread/100);
+const sellRate = c => STATE.prices[c] * USD_NGN * (1 + STATE.spread/100);
+
+function toast(msg, dur=2500) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+
+// ── ROUTING ──
+function show(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = $(pageId);
+  if (el) { el.classList.add('active'); window.scrollTo(0,0); }
+}
+
+// ── AUTH ──
+// Demo accounts
+const ACCOUNTS = {
+  'larridzekk@gmail.com': { password:'coleK1D$ig#', name:'Admin', role:'admin', kyc:'approved' },
+
+};
+
+function doLogin() {
+  const email = $('login-email').value.trim().toLowerCase();
+  const pass  = $('login-pass').value;
+  const err   = $('login-err');
+  if (!email || !pass) { err.textContent = 'Please fill all fields.'; return; }
+  const acc = ACCOUNTS[email];
+  if (!acc || acc.password !== pass) { err.textContent = 'Invalid email or password.'; return; }
+  err.textContent = '';
+  STATE.user = { email, ...acc };
+  afterLogin();
+}
+
+function doRegister() {
+  const name  = $('reg-name').value.trim();
+  const email = $('reg-email').value.trim().toLowerCase();
+  const pass  = $('reg-pass').value;
+  const pass2 = $('reg-pass2').value;
+  const err   = $('reg-err');
+  if (!name||!email||!pass||!pass2) { err.textContent='Please fill all fields.'; return; }
+  if (pass !== pass2)               { err.textContent='Passwords do not match.'; return; }
+  if (pass.length < 6)              { err.textContent='Password must be at least 6 characters.'; return; }
+  if (ACCOUNTS[email])              { err.textContent='An account with this email already exists.'; return; }
+  err.textContent = '';
+  ACCOUNTS[email] = { password:pass, name, role:'user', kyc:'pending' };
+  STATE.user = { email, name, role:'user', kyc:'pending' };
+  toast('Account created! Welcome to Elite Trading.');
+  afterLogin();
+}
+
+function afterLogin() {
+  startPriceFeed();
+  if (STATE.user.role === 'admin') {
+    renderAdminHome(); show('admin-home');
+  } else {
+    renderUserHome(); show('user-home');
+  }
+}
+
+function doLogout() {
+  STATE.user = null;
+  clearInterval(STATE.priceInterval);
+  show('login');
+}
+
+// ── PRICE FEED ──
+async function fetchPrices() {
+  try {
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin,tether&vs_currencies=usd');
+    const d = await r.json();
+    STATE.prices.BTC  = d.bitcoin?.usd     || STATE.prices.BTC;
+    STATE.prices.ETH  = d.ethereum?.usd    || STATE.prices.ETH;
+    STATE.prices.BNB  = d.binancecoin?.usd || STATE.prices.BNB;
+    STATE.prices.USDT = d.tether?.usd      || 1;
+    onPricesUpdated();
+  } catch {
+    onPricesUpdated(); // use cached
+  }
+}
+
+function onPricesUpdated() {
+  initOrderNGN();
+  const lu = $('last-updated');
+  if (lu) lu.textContent = 'Updated ' + new Date().toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit'});
+  renderRatesInPage('admin-rates');
+  renderRatesInPage('user-rates');
+  renderSpreadPreview();
+}
+
+function startPriceFeed() {
+  fetchPrices();
+  clearInterval(STATE.priceInterval);
+  STATE.priceInterval = setInterval(fetchPrices, 60000);
+}
+
+// ── LOGO SVG ──
+function logoSVG(width=140) {
+  return `<svg width="${width}" viewBox="0 0 310 130" xmlns="http://www.w3.org/2000/svg">
+    <rect x="4"  y="14" width="8"  height="82" fill="#00D9B0"/>
+    <rect x="4"  y="14" width="46" height="8"  fill="#00D9B0"/>
+    <rect x="4"  y="53" width="34" height="8"  fill="#00D9B0"/>
+    <rect x="4"  y="88" width="46" height="8"  fill="#00D9B0"/>
+    <rect x="50" y="14" width="30" height="8"  fill="white" opacity=".9"/>
+    <rect x="65" y="22" width="8"  height="44" fill="white" opacity=".9"/>
+    <text x="92" y="72" font-family="'Arial Black','Arial',sans-serif" font-size="46" font-weight="900" fill="white" dominant-baseline="middle" letter-spacing="-1">ELITE</text>
+    <text x="92" y="106" font-family="'Arial',sans-serif" font-size="18" font-weight="700" fill="#00D9B0" letter-spacing="7">TRADING</text>
+    <line x1="92" y1="115" x2="306" y2="115" stroke="#00D9B0" stroke-width=".7" opacity=".2"/>
+    <text x="92" y="127" font-family="sans-serif" font-size="9" fill="#00D9B0" opacity=".5" letter-spacing="3.5">CRYPTO EXCHANGE</text>
+  </svg>`;
+}
+
+// ── COIN DATA ──
+const COINS = {
+  USDT:{ sym:'₮', cls:'ci-usdt', name:'Tether' },
+  BTC: { sym:'₿', cls:'ci-btc',  name:'Bitcoin' },
+  ETH: { sym:'Ξ', cls:'ci-eth',  name:'Ethereum' },
+  BNB: { sym:'B', cls:'ci-bnb',  name:'BNB Chain' },
+};
+
+function rateRowHTML(c) {
+  return `<div class="rate-row">
+    <div class="coin-pill">
+      <div class="coin-icon ${COINS[c].cls}">${COINS[c].sym}</div>
+      <div><div class="coin-name">${c}</div><div class="coin-sub">${COINS[c].name}</div></div>
+    </div>
+    <div class="rate-prices">
+      <div class="rate-buy">Buy ${fmtNGN(buyRate(c))}</div>
+      <div class="rate-sell">Sell ${fmtNGN(sellRate(c))}</div>
+    </div>
+  </div>`;
+}
+
+function renderRatesInPage(elId) {
+  const el = $(elId);
+  if (el) el.innerHTML = Object.keys(COINS).map(rateRowHTML).join('');
+}
+
+// ── ADMIN HOME ──
+function renderAdminHome() {
+  const pending   = STATE.orders.filter(o=>o.status==='pending').length;
+  const todayVol  = STATE.orders.reduce((s,o)=>s+(o.ngn||0),0);
+  const totalOrders = STATE.orders.length;
+  const registered  = STATE.users.length;
+  const kycPending  = STATE.users.filter(u=>u.kyc==='pending').length;
+  if($('adm-pending'))    $('adm-pending').textContent    = pending;
+  if($('adm-volume'))     $('adm-volume').textContent     = todayVol > 0 ? fmtNGN(todayVol) : '₦0';
+  if($('adm-spread'))     $('adm-spread').textContent     = STATE.spread + '%';
+  if($('adm-orders'))     $('adm-orders').textContent     = totalOrders;
+  if($('adm-registered')) $('adm-registered').textContent = registered;
+  if($('adm-kyc-pending'))$('adm-kyc-pending').textContent= kycPending;
+  renderRatesInPage('admin-rates');
+}
+
+// ── ADMIN ORDERS ──
+function renderAdminOrders(filter='all') {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.filter===filter));
+  const list = filter==='all' ? STATE.orders : STATE.orders.filter(o=>o.status===filter);
+  $('orders-list').innerHTML = list.map(o => `
+    <div class="order-item fade-up" onclick="openOrderDetail('${o.id}')">
+      <div class="order-head">
+        <div>
+          <div class="order-title">${o.type} ${o.amount} ${o.coin}</div>
+          <div class="order-meta">${o.time} · ${fmtNGN(o.ngn)}</div>
+        </div>
+        <span class="badge b-${o.status}">${o.status}</span>
+      </div>
+      <div class="order-user">${o.userName}</div>
+    </div>`).join('') || '<p style="color:var(--text-3);font-size:14px;padding:12px 0;">No orders found.</p>';
+}
+
+function openOrderDetail(id) {
+  const o = STATE.orders.find(x=>x.id===id);
+  $('od-title').textContent  = `${o.type} ${o.amount} ${o.coin}`;
+  $('od-badge').className    = `badge b-${o.status}`;
+  $('od-badge').textContent  = o.status;
+  $('od-user').textContent   = o.userName;
+  $('od-email').textContent  = o.user;
+  $('od-amount').textContent = fmtNGN(o.ngn);
+  $('od-time').textContent   = o.time;
+  $('od-proof').textContent  = o.proof;
+  const actions = $('od-actions');
+  actions.innerHTML = o.status === 'pending'
+    ? `<button class="btn btn-success btn-sm" onclick="updateOrder('${o.id}','completed')"><i class="ti ti-check"></i> Confirm payment</button>
+       <button class="btn btn-danger btn-sm"  onclick="updateOrder('${o.id}','rejected')"><i class="ti ti-x"></i> Reject</button>`
+    : `<p style="font-size:13px;color:var(--text-3);">Order ${o.status}.</p>`;
+  show('admin-order-detail');
+}
+
+function updateOrder(id, status) {
+  const o = STATE.orders.find(x=>x.id===id);
+  o.status = status;
+  toast(status==='completed' ? '✓ Payment confirmed — notify user to release crypto.' : 'Order rejected.');
+  show('admin-orders');
+  renderAdminOrders();
+}
+
+// ── ADMIN SPREAD ──
+function updateSpread() {
+  const v = parseFloat($('spread-val').value) || 2;
+  STATE.spread = v;
+  $('spread-display').textContent = v + '%';
+  renderSpreadPreview();
+}
+
+function renderSpreadPreview() {
+  const el = $('spread-preview');
+  if (!el) return;
+  el.innerHTML = Object.keys(COINS).map(c => `
+    <div class="card" style="margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-weight:600;">${c}</span>
+        <span style="font-size:12px;color:var(--text-3);">Market: ${fmtNGN(STATE.prices[c]*USD_NGN)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;">
+        <span style="font-size:13px;color:var(--teal);">Buy: ${fmtNGN(buyRate(c))}</span>
+        <span style="font-size:13px;color:var(--danger);">Sell: ${fmtNGN(sellRate(c))}</span>
+      </div>
+    </div>`).join('');
+}
+
+// ── ADMIN USERS ──
+function renderAdminUsers() {
+  $('users-list').innerHTML = STATE.users.map(u => `
+    <div class="user-row">
+      <div>
+        <div class="user-name">${u.name}</div>
+        <div class="user-sub">${u.email} · ${u.trades} trades</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+        <span class="badge ${u.kyc==='approved'?'b-completed':'b-pending'}">${u.kyc}</span>
+        ${u.kyc==='pending'
+          ? `<button class="btn btn-success btn-sm" style="padding:4px 10px;font-size:11px;" onclick="approveUser('${u.email}')">Approve</button>`
+          : ''}
+      </div>
+    </div>`).join('');
+}
+
+function approveUser(email) {
+  const u = STATE.users.find(x=>x.email===email);
+  u.kyc = 'approved';
+  toast('User KYC approved.');
+  renderAdminUsers();
+}
+
+// ── ADMIN RECORDS ──
+function renderAdminRecords() {
+  const completed = STATE.orders.filter(o=>o.status==='completed');
+  const vol = completed.reduce((s,o)=>s+(o.ngn||0),0);
+  const est = vol * STATE.spread / 100;
+  $('rec-vol').textContent    = fmtNGN(vol);
+  $('rec-trades').textContent = completed.length;
+  $('rec-earn').textContent   = fmtNGN(est);
+  $('rec-avg').textContent    = completed.length ? fmtNGN(vol/completed.length) : '₦0';
+  const byAsset = {};
+  completed.forEach(o => { byAsset[o.coin] = (byAsset[o.coin]||0)+1; });
+  $('rec-breakdown').innerHTML = Object.entries(byAsset).map(([c,n])=>`
+    <div class="rate-row" style="padding:8px 0;">
+      <span style="font-size:13px;color:var(--text-2);">${c} trades</span>
+      <span style="font-size:14px;font-weight:600;">${n}</span>
+    </div>`).join('') || '<p style="font-size:13px;color:var(--text-3);">No completed trades yet.</p>';
+}
+
+// ── USER HOME ──
+function renderUserHome() {
+  if (!STATE.user) return;
+  $('user-greeting').textContent = 'Good day, ' + STATE.user.name.split(' ')[0];
+  renderRatesInPage('user-rates');
+}
+
+// ── USER BUY/SELL CALC ──
+function calcBuy() {
+  const coin = $('buy-coin').value;
+  const ngn  = parseFloat($('buy-ngn').value) || 0;
+  const rate = sellRate(coin);
+  if (ngn > 0 && rate > 0) {
+    const amt = ngn / rate;
+    $('buy-result-val').textContent  = (amt < 0.001 ? amt.toFixed(8) : amt.toFixed(6)) + ' ' + coin;
+    $('buy-result-note').textContent = `Rate: ${fmtNGN(rate)} per ${coin}`;
+  } else {
+    $('buy-result-val').textContent  = '—';
+    $('buy-result-note').textContent = '';
+  }
+}
+
+function calcSell() {
+  const coin = $('sell-coin').value;
+  const amt  = parseFloat($('sell-amt').value) || 0;
+  const rate = buyRate(coin);
+  if (amt > 0 && rate > 0) {
+    $('sell-result-val').textContent  = fmtNGN(amt * rate);
+    $('sell-result-note').textContent = `Rate: ${fmtNGN(rate)} per ${coin}`;
+  } else {
+    $('sell-result-val').textContent  = '—';
+    $('sell-result-note').textContent = '';
+  }
+}
+
+function submitBuyOrder() {
+  const coin = $('buy-coin').value;
+  const ngn  = parseFloat($('buy-ngn').value) || 0;
+  if (!ngn) { toast('Please enter an amount.'); return; }
+  const rate = sellRate(coin);
+  const amt  = ngn / rate;
+  const newOrder = {
+    id: 'ORD' + Date.now(),
+    user: STATE.user.email,
+    userName: STATE.user.name,
+    type: 'Buy', coin, amount: parseFloat(amt.toFixed(6)),
+    ngn: Math.round(ngn), status: 'pending',
+    time: 'Just now', proof: 'receipt_upload.jpg'
+  };
+  STATE.orders.unshift(newOrder);
+  toast('✓ Buy order submitted. Awaiting confirmation.');
+  show('user-orders');
+  renderUserOrders();
+}
+
+function submitSellOrder() {
+  const coin = $('sell-coin').value;
+  const amt  = parseFloat($('sell-amt').value) || 0;
+  if (!amt) { toast('Please enter an amount.'); return; }
+  const rate = buyRate(coin);
+  const newOrder = {
+    id: 'ORD' + Date.now(),
+    user: STATE.user.email,
+    userName: STATE.user.name,
+    type: 'Sell', coin, amount: amt,
+    ngn: Math.round(amt * rate), status: 'pending',
+    time: 'Just now', proof: 'sell_proof.jpg'
+  };
+  STATE.orders.unshift(newOrder);
+  toast('✓ Sell order submitted. Awaiting confirmation.');
+  show('user-orders');
+  renderUserOrders();
+}
+
+// ── USER ORDERS ──
+function renderUserOrders() {
+  if (!STATE.user) return;
+  const mine = STATE.orders.filter(o => o.user === STATE.user.email);
+  $('user-orders-list').innerHTML = mine.map(o => `
+    <div class="order-item fade-up">
+      <div class="order-head">
+        <div>
+          <div class="order-title">${o.type} ${o.amount} ${o.coin}</div>
+          <div class="order-meta">${o.time} · ${fmtNGN(o.ngn)}</div>
+        </div>
+        <span class="badge b-${o.status}">${o.status}</span>
+      </div>
+      <div class="order-user" style="color:${o.status==='completed'?'var(--teal)':o.status==='rejected'?'var(--danger)':'var(--text-3)'}">
+        ${o.status==='completed'?'✓ Completed':o.status==='rejected'?'✗ Rejected':'Awaiting admin confirmation'}
+      </div>
+    </div>`).join('') || '<p style="color:var(--text-3);font-size:14px;padding:12px 0;">No orders yet.</p>';
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  // Stamp logos
+  document.querySelectorAll('[data-logo]').forEach(el => {
+    el.innerHTML = logoSVG(parseInt(el.dataset.logo)||140);
+  });
+
+  // Splash
+  let pct = 0;
+  const bar = $('splash-fill');
+  const si = setInterval(() => {
+    pct += 2; if(bar) bar.style.width = pct+'%';
+    if (pct >= 100) {
+      clearInterval(si);
+      setTimeout(() => { $('splash').classList.add('hide'); show('login'); }, 300);
+    }
+  }, 40);
+
+  initOrderNGN();
+});
+
+</script>
+</body>
+</html>
