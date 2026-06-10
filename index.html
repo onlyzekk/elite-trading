@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#08150F">
+  <meta name="description" content="Elite Trading — Nigeria's trusted crypto exchange.">
+  <title>Elite Trading</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+:root {
+  --teal:#00D9B0; --teal-dim:#00a887; --dark:#08150F; --dark-2:#0d1f18;
+  --dark-3:#132a20; --dark-4:#1a3829; --surface:#0f2019;
+  --border:rgba(0,217,176,.12); --border-2:rgba(0,217,176,.06);
+  --text-1:#f0faf7; --text-2:#8ab5a8; --text-3:#4d7a6e;
+  --success:#00D9B0; --danger:#ff5f5f; --warning:#f5a623;
+  --radius:14px; --radius-sm:8px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--dark);color:var(--text-1);min-height:100vh;overflow-x:hidden}
+h1,h2,h3,h4{font-family:'Syne',sans-serif}
+
+/* SPLASH */
+#splash{position:fixed;inset:0;background:var(--dark);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .5s,visibility .5s}
+#splash.hide{opacity:0;visibility:hidden}
+.splash-bar-track{width:56px;height:2px;background:rgba(0,217,176,.15);border-radius:4px;overflow:hidden;margin-top:40px}
+.splash-bar-fill{height:100%;width:0%;background:var(--teal);border-radius:4px}
+.splash-label{margin-top:12px;font-size:10px;letter-spacing:3px;color:var(--teal);opacity:.4}
+
+/* LAYOUT */
+.app{max-width:430px;margin:0 auto;min-height:100vh}
+.page{display:none;padding:0 20px 100px;min-height:100vh}
+.page.active{display:block}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 0 16px;position:sticky;top:0;z-index:100;background:var(--dark)}
+.topbar-actions{display:flex;align-items:center;gap:12px}
+.icon-btn{width:36px;height:36px;border-radius:50%;background:var(--surface);border:.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;color:var(--text-2);font-size:16px}
+.notif-dot{width:7px;height:7px;border-radius:50%;background:#ff5f5f;border:1.5px solid var(--dark);position:absolute;top:2px;right:2px}
+
+/* BACK NAV */
+.back-nav{display:flex;align-items:center;gap:10px;padding:18px 0 14px;border-bottom:.5px solid var(--border-2);margin-bottom:20px}
+.back-btn{width:34px;height:34px;border-radius:50%;background:var(--surface);border:.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text-2);font-size:16px;flex-shrink:0}
+.back-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:600}
+
+/* AUTH */
+.auth-wrap{display:flex;flex-direction:column;align-items:center;padding:48px 20px 40px;min-height:100vh}
+.auth-logo{width:180px;margin-bottom:36px}
+.auth-card{width:100%;background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius);padding:28px 24px}
+.auth-title{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px}
+.auth-sub{font-size:14px;color:var(--text-2);margin-bottom:24px}
+.auth-switch{margin-top:20px;text-align:center;font-size:14px;color:var(--text-2)}
+.auth-switch a{color:var(--teal);cursor:pointer;text-decoration:none}
+
+/* FORM */
+.field{margin-bottom:16px}
+.field label{display:block;font-size:12px;color:var(--text-2);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase}
+.field input,.field select{width:100%;padding:12px 14px;background:var(--dark-3);border:.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text-1);font-size:15px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.field input:focus,.field select:focus{border-color:var(--teal)}
+.field input::placeholder{color:var(--text-3)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 20px;border-radius:var(--radius-sm);font-size:15px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;border:none;transition:all .2s;width:100%}
+.btn-primary{background:var(--teal);color:var(--dark)}
+.btn-primary:hover{background:var(--teal-dim)}
+.btn-outline{background:transparent;color:var(--teal);border:1px solid var(--teal)}
+.btn-danger{background:rgba(255,95,95,.12);color:var(--danger);border:.5px solid rgba(255,95,95,.3)}
+.btn-success{background:rgba(0,217,176,.1);color:var(--teal);border:.5px solid var(--border)}
+.btn-ghost{background:var(--surface);color:var(--text-1);border:.5px solid var(--border)}
+.btn-sm{padding:7px 12px;font-size:12px;width:auto;border-radius:6px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* CARDS */
+.card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px}
+.card-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+
+/* METRICS */
+.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.metric-card{background:var(--dark-3);border:.5px solid var(--border-2);border-radius:var(--radius-sm);padding:14px}
+.metric-label{font-size:11px;color:var(--text-3);letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.metric-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--text-1)}
+.metric-val.warn{color:var(--warning)}
+.metric-val.teal{color:var(--teal)}
+
+/* RATES */
+.rate-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:.5px solid var(--border-2)}
+.rate-row:last-child{border-bottom:none}
+.coin-pill{display:flex;align-items:center;gap:10px}
+.coin-icon{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700}
+.ci-usdt{background:#0d2e22;color:#00D9B0}
+.ci-btc{background:#2e1f0a;color:#f7a325}
+.ci-eth{background:#1a1a3e;color:#a090f0}
+.ci-bnb{background:#2e1a0a;color:#f0b90b}
+.coin-name{font-size:14px;font-weight:500}
+.coin-sub{font-size:11px;color:var(--text-3);margin-top:1px}
+.rate-prices{text-align:right}
+.rate-buy{font-size:12px;color:var(--teal);margin-bottom:2px}
+.rate-sell{font-size:12px;color:var(--danger)}
+
+/* BADGES */
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px}
+.b-pending{background:rgba(245,166,35,.12);color:var(--warning)}
+.b-completed{background:rgba(0,217,176,.12);color:var(--teal)}
+.b-rejected{background:rgba(255,95,95,.12);color:var(--danger)}
+.b-verified{background:rgba(0,217,176,.12);color:var(--teal)}
+.b-approved{background:rgba(0,217,176,.12);color:var(--teal)}
+
+/* ORDERS */
+.order-item{background:var(--dark-3);border:.5px solid var(--border-2);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .2s}
+.order-item:hover{border-color:var(--border)}
+.order-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.order-title{font-size:15px;font-weight:500}
+.order-meta{font-size:12px;color:var(--text-3);margin-top:2px}
+.order-user{font-size:12px;color:var(--text-2)}
+
+/* TABS */
+.tabs{display:flex;border-bottom:.5px solid var(--border-2);margin-bottom:16px}
+.tab-btn{flex:1;text-align:center;padding:10px 8px;font-size:13px;color:var(--text-3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.tab-btn.active{color:var(--teal);border-bottom-color:var(--teal);font-weight:500}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--dark-2);border-top:.5px solid var(--border);display:flex;padding:10px 0 16px;z-index:200}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;color:var(--text-3);cursor:pointer;transition:color .2s;padding:2px 0}
+.bnav-item i{font-size:22px}
+.bnav-item.active{color:var(--teal)}
+
+/* STEPS */
+.step-row{display:flex;align-items:flex-start;gap:14px;padding:12px 0;border-bottom:.5px solid var(--border-2)}
+.step-row:last-child{border-bottom:none}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--dark-3);border:.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0;color:var(--text-2)}
+.step-num.done{background:rgba(0,217,176,.12);color:var(--teal);border-color:var(--teal)}
+.step-num.active-step{background:rgba(0,217,176,.08);color:var(--teal);border-color:var(--teal);animation:pulse 1.5s ease infinite}
+.step-label{font-size:14px;font-weight:500;margin-bottom:2px}
+.step-sub{font-size:12px;color:var(--text-3)}
+
+/* PROOF BOX */
+.proof-box{border:.5px dashed var(--border);border-radius:var(--radius-sm);padding:20px;text-align:center;cursor:pointer;margin-bottom:16px;transition:border-color .2s}
+.proof-box:hover{border-color:var(--teal)}
+.proof-box i{font-size:28px;color:var(--text-3);display:block;margin-bottom:8px}
+.proof-box p{font-size:13px;color:var(--text-3)}
+
+/* ALERTS */
+.warn-box{background:rgba(245,166,35,.08);border:.5px solid rgba(245,166,35,.25);border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;color:var(--warning);margin-bottom:14px}
+.info-box{background:rgba(0,217,176,.06);border:.5px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;color:var(--text-2);margin-bottom:14px}
+.success-box{background:rgba(0,217,176,.1);border:.5px solid var(--teal);border-radius:var(--radius-sm);padding:12px;font-size:13px;color:var(--teal);margin-bottom:14px;text-align:center}
+
+/* CALC */
+.calc-result{background:var(--dark-3);border:.5px solid var(--border-2);border-radius:var(--radius-sm);padding:16px;margin-bottom:16px}
+.calc-label{font-size:12px;color:var(--text-3);margin-bottom:6px}
+.calc-val{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;color:var(--teal)}
+.calc-note{font-size:12px;color:var(--text-3);margin-top:4px}
+
+/* TOAST */
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--dark-4);border:.5px solid var(--border);border-radius:30px;padding:10px 20px;font-size:13px;color:var(--text-1);opacity:0;pointer-events:none;transition:opacity .3s;z-index:9999;white-space:nowrap}
+#toast.show{opacity:1}
+
+/* CAMERA / KYC */
+.camera-wrap{position:relative;width:100%;border-radius:var(--radius);overflow:hidden;background:#000;margin-bottom:16px;aspect-ratio:3/4}
+#kyc-video{width:100%;height:100%;object-fit:cover;display:block}
+.camera-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.face-guide{width:200px;height:200px;border-radius:50%;border:2px solid var(--teal);opacity:.7;position:relative}
+.face-guide::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:1px solid rgba(0,217,176,.3)}
+.camera-hint{color:white;font-size:13px;text-align:center;margin-top:16px;text-shadow:0 1px 4px rgba(0,0,0,.8);padding:0 20px}
+#kyc-canvas{display:none}
+
+.kyc-progress{display:flex;gap:8px;margin-bottom:20px}
+.kyc-step-dot{flex:1;height:3px;border-radius:3px;background:var(--dark-3);transition:background .3s}
+.kyc-step-dot.done{background:var(--teal)}
+.kyc-step-dot.active{background:var(--teal);opacity:.5}
+
+/* DIVIDER */
+.divider{border:none;border-top:.5px solid var(--border-2);margin:16px 0}
+.section-label{font-size:11px;color:var(--text-3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;margin-top:4px}
+
+/* RANGE */
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;background:var(--dark-3);border-radius:4px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--teal);cursor:pointer;border:3px solid var(--dark)}
+
+/* USER ROW */
+.user-row{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-bottom:.5px solid var(--border-2)}
+.user-row:last-child{border-bottom:none}
+.user-name{font-size:14px;font-weight:500}
+.user-sub{font-size:11px;color:var(--text-3);margin-top:2px}
+
+/* SETUP SCREEN */
+.setup-card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--radius);padding:24px;margin-bottom:16px}
+.setup-step{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:.5px solid var(--border-2)}
+.setup-step:last-child{border-bottom:none}
+.setup-num{width:28px;height:28px;border-radius:50%;background:var(--teal);color:var(--dark);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .4s ease forwards}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.pulse{animation:pulse 1.5s ease infinite}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+  </style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div style="width:220px" id="splash-logo"></div>
+  <div class="splash-bar-track"><div id="splash-fill" class="splash-bar-fill"></div></div>
+  <div class="splash-label">LOADING</div>
+</div>
+
+<div id="toast"></div>
+<div class="app">
+
+<!-- ══ SETUP (first time config) ══ -->
+<div id="setup" class="page">
+  <div style="padding:40px 0 20px;text-align:center;">
+    <div style="width:160px;margin:0 auto 24px;" id="setup-logo"></div>
+    <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:8px;">Connect your database</div>
+    <div style="font-size:14px;color:var(--text-2);margin-bottom:28px;">One-time setup to power real users and persistent data</div>
+  </div>
+  <div class="setup-card">
+    <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:600;margin-bottom:16px;color:var(--teal);">Step-by-step: Supabase setup</div>
+    <div class="setup-step">
+      <div class="setup-num">1</div>
+      <div><div style="font-size:14px;font-weight:500;margin-bottom:2px;">Go to supabase.com</div><div style="font-size:12px;color:var(--text-3);">Sign up free → Create new project → Note your project URL and anon key</div></div>
+    </div>
+    <div class="setup-step">
+      <div class="setup-num">2</div>
+      <div><div style="font-size:14px;font-weight:500;margin-bottom:2px;">Run this SQL in Supabase</div><div style="font-size:12px;color:var(--text-3);">Go to SQL Editor → paste the schema below → click Run</div></div>
+    </div>
+    <div class="setup-step">
+      <div class="setup-num">3</div>
+      <div><div style="font-size:14px;font-weight:500;margin-bottom:2px;">Paste your keys below</div><div style="font-size:12px;color:var(--text-3);">Enter your Supabase URL and anon key to connect</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">SQL schema — paste in Supabase</div>
+    <div style="background:var(--dark-3);border-radius:var(--radius-sm);padding:12px;font-size:11px;color:var(--teal);font-family:monospace;line-height:1.6;overflow-x:auto;white-space:pre;">CREATE TABLE profiles (
+  id uuid REFERENCES auth.users PRIMARY KEY,
+  full_name text,
+  email text,
+  role text DEFAULT 'user',
+  kyc_status text DEFAULT 'pending',
+  kyc_bvn text,
+  kyc_nin text,
+  kyc_selfie_url text,
+  kyc_id_url text,
+  created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE orders (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid REFERENCES profiles(id),
+  user_name text,
+  user_email text,
+  type text,
+  coin text,
+  amount numeric,
+  ngn_amount numeric,
+  rate numeric,
+  status text DEFAULT 'pending',
+  proof_url text,
+  bank_name text,
+  account_number text,
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE orders ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users read own profile"
+  ON profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Users update own profile"
+  ON profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users insert own profile"
+  ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+CREATE POLICY "Admin full access profiles"
+  ON profiles FOR ALL USING (
+    EXISTS (SELECT 1 FROM profiles WHERE id=auth.uid() AND role='admin')
+  );
+CREATE POLICY "Users read own orders"
+  ON orders FOR SELECT USING (user_id = auth.uid());
+CREATE POLICY "Users insert own orders"
+  ON orders FOR INSERT WITH CHECK (user_id = auth.uid());
+CREATE POLICY "Admin full access orders"
+  ON orders FOR ALL USING (
+    EXISTS (SELECT 1 FROM profiles WHERE id=auth.uid() AND role='admin')
+  );</div>
+    <button class="btn btn-ghost" style="margin-top:10px;font-size:12px;" onclick="copySQL()">
+      <i class="ti ti-copy"></i> Copy SQL
+    </button>
+  </div>
+
+  <div class="field">
+    <label>Supabase project URL</label>
+    <input id="sb-url" type="url" placeholder="https://xxxxxxxxxxxx.supabase.co">
+  </div>
+  <div class="field">
+    <label>Supabase anon key</label>
+    <input id="sb-key" type="text" placeholder="eyJhbGci...">
+  </div>
+  <div id="setup-err" style="font-size:13px;color:var(--danger);margin-bottom:12px;min-height:16px;"></div>
+  <button class="btn btn-primary" onclick="saveSupabaseConfig()">
+    <i class="ti ti-plug"></i> Connect & continue
+  </button>
+</div>
+
+<!-- ══ LOGIN ══ -->
+<div id="login" class="page">
+  <div class="auth-wrap">
+    <div class="auth-logo" id="login-logo"></div>
+    <div class="auth-card">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to your account</div>
+      <div class="field">
+        <label>Email address</label>
+        <input id="login-email" type="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div id="login-err" style="font-size:13px;color:var(--danger);margin-bottom:12px;min-height:16px;"></div>
+      <button class="btn btn-primary" id="login-btn" onclick="doLogin()">
+        <i class="ti ti-login"></i> Sign in
+      </button>
+    </div>
+    <div class="auth-switch">Don't have an account? <a onclick="show('register')">Create one</a></div>
+  </div>
+</div>
+
+<!-- ══ REGISTER ══ -->
+<div id="register" class="page">
+  <div class="auth-wrap">
+    <div class="auth-logo" id="reg-logo"></div>
+    <div class="auth-card">
+      <div class="auth-title">Create account</div>
+      <div class="auth-sub">Join Elite Trading today</div>
+      <div class="field">
+        <label>Full name</label>
+        <input id="reg-name" type="text" placeholder="e.g. Chidi Okafor" autocomplete="name">
+      </div>
+      <div class="field">
+        <label>Email address</label>
+        <input id="reg-email" type="email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input id="reg-pass" type="password" placeholder="Min. 6 characters" autocomplete="new-password">
+      </div>
+      <div class="field">
+        <label>Confirm password</label>
+        <input id="reg-pass2" type="password" placeholder="Re-enter password">
+      </div>
+      <div id="reg-err" style="font-size:13px;color:var(--danger);margin-bottom:12px;min-height:16px;"></div>
+      <button class="btn btn-primary" id="reg-btn" onclick="doRegister()">
+        <i class="ti ti-user-plus"></i> Create account
+      </button>
+    </div>
+    <div class="auth-switch">Already have an account? <a onclick="show('login')">Sign in</a></div>
+  </div>
+</div>
+
+<!-- ══ ADMIN HOME ══ -->
+<div id="admin-home" class="page">
+  <div class="topbar">
+    <div id="adm-logo" style="width:130px;"></div>
+    <div class="topbar-actions">
+      <div class="icon-btn" onclick="loadAdminOrders(); show('admin-orders');">
+        <i class="ti ti-bell"></i><span class="notif-dot" id="notif-dot"></span>
+      </div>
+      <div class="icon-btn" onclick="doLogout()"><i class="ti ti-logout"></i></div>
+    </div>
+  </div>
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-label">Total orders</div><div class="metric-val" id="adm-orders">—</div></div>
+    <div class="metric-card"><div class="metric-label">Pending</div><div class="metric-val warn" id="adm-pending">—</div></div>
+    <div class="metric-card"><div class="metric-label">Volume (NGN)</div><div class="metric-val teal" id="adm-volume">—</div></div>
+    <div class="metric-card"><div class="metric-label">Your spread</div><div class="metric-val" id="adm-spread">2%</div></div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div class="card-title" style="margin:0;">Live rates</div>
+      <div style="font-size:11px;color:var(--text-3);" id="last-updated"><span class="pulse">Updating...</span></div>
+    </div>
+    <div id="admin-rates"></div>
+  </div>
+  <button class="btn btn-outline" onclick="show('admin-spread'); renderSpreadPreview();">
+    <i class="ti ti-adjustments"></i> Adjust spread & rates
+  </button>
+  <div class="bottom-nav">
+    <div class="bnav-item active" onclick="loadAdminHome(); show('admin-home');"><i class="ti ti-layout-dashboard"></i><span>Dashboard</span></div>
+    <div class="bnav-item" onclick="loadAdminOrders(); show('admin-orders');"><i class="ti ti-list-check"></i><span>Orders</span></div>
+    <div class="bnav-item" onclick="loadAdminUsers(); show('admin-users');"><i class="ti ti-users"></i><span>Users</span></div>
+    <div class="bnav-item" onclick="loadAdminRecords(); show('admin-records');"><i class="ti ti-chart-bar"></i><span>Records</span></div>
+  </div>
+</div>
+
+<!-- ══ ADMIN SPREAD ══ -->
+<div id="admin-spread" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('admin-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Spread & rates</div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div class="card-title" style="margin:0;">Your spread</div>
+      <div style="font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:var(--teal);" id="spread-display">2%</div>
+    </div>
+    <input type="range" id="spread-val" min="0.5" max="10" step="0.5" value="2" oninput="updateSpread()">
+    <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--text-3);"><span>0.5%</span><span>10%</span></div>
+  </div>
+  <div class="section-label">Rate preview</div>
+  <div id="spread-preview"></div>
+  <button class="btn btn-primary" onclick="toast('Spread saved ✓'); show('admin-home'); loadAdminHome();">
+    <i class="ti ti-check"></i> Save & apply
+  </button>
+</div>
+
+<!-- ══ ADMIN ORDERS ══ -->
+<div id="admin-orders" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('admin-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Orders</div>
+  </div>
+  <div class="tabs">
+    <div class="tab-btn active" onclick="filterAdminOrders('all',this)">All</div>
+    <div class="tab-btn" onclick="filterAdminOrders('pending',this)">Pending</div>
+    <div class="tab-btn" onclick="filterAdminOrders('completed',this)">Completed</div>
+    <div class="tab-btn" onclick="filterAdminOrders('rejected',this)">Rejected</div>
+  </div>
+  <div id="admin-orders-list"></div>
+</div>
+
+<!-- ══ ADMIN ORDER DETAIL ══ -->
+<div id="admin-order-detail" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('admin-orders')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Order detail</div>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;" id="od-title"></div>
+      <span id="od-badge" class="badge"></span>
+    </div>
+    <div class="rate-row" style="padding:8px 0;"><span style="font-size:13px;color:var(--text-3);">User</span><span style="font-size:14px;font-weight:500;" id="od-user"></span></div>
+    <div class="rate-row" style="padding:8px 0;"><span style="font-size:13px;color:var(--text-3);">Email</span><span style="font-size:13px;" id="od-email"></span></div>
+    <div class="rate-row" style="padding:8px 0;"><span style="font-size:13px;color:var(--text-3);">NGN amount</span><span style="font-size:14px;font-weight:600;color:var(--teal);" id="od-amount"></span></div>
+    <div class="rate-row" style="padding:8px 0;"><span style="font-size:13px;color:var(--text-3);">Rate</span><span style="font-size:13px;" id="od-rate"></span></div>
+    <div class="rate-row" style="padding:8px 0;border:none;"><span style="font-size:13px;color:var(--text-3);">Time</span><span style="font-size:13px;" id="od-time"></span></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Payment proof</div>
+    <div id="od-proof-wrap" style="background:var(--dark-3);border-radius:var(--radius-sm);padding:16px;text-align:center;border:.5px solid var(--border-2);">
+      <i class="ti ti-file-description" style="font-size:36px;color:var(--text-3);display:block;margin-bottom:8px;"></i>
+      <div style="font-size:13px;color:var(--text-2);" id="od-proof">No proof uploaded</div>
+    </div>
+  </div>
+  <div id="od-actions" style="display:flex;gap:10px;margin-top:4px;"></div>
+  <div style="font-size:12px;color:var(--text-3);margin-top:10px;">After confirming, manually send crypto to the user's wallet and mark complete.</div>
+</div>
+
+<!-- ══ ADMIN USERS ══ -->
+<div id="admin-users" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('admin-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Users</div>
+  </div>
+  <div class="metric-grid" style="margin-bottom:16px;">
+    <div class="metric-card"><div class="metric-label">Registered</div><div class="metric-val" id="adm-registered">—</div></div>
+    <div class="metric-card"><div class="metric-label">KYC pending</div><div class="metric-val warn" id="adm-kyc-pending">—</div></div>
+  </div>
+  <div class="section-label">All users</div>
+  <div class="card"><div id="users-list"><div style="font-size:13px;color:var(--text-3);padding:8px 0;">Loading...</div></div></div>
+</div>
+
+<!-- ══ ADMIN RECORDS ══ -->
+<div id="admin-records" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('admin-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Trade records</div>
+  </div>
+  <div class="metric-grid">
+    <div class="metric-card"><div class="metric-label">Total volume</div><div class="metric-val teal" id="rec-vol">—</div></div>
+    <div class="metric-card"><div class="metric-label">Completed trades</div><div class="metric-val" id="rec-trades">—</div></div>
+    <div class="metric-card"><div class="metric-label">Est. earnings</div><div class="metric-val teal" id="rec-earn">—</div></div>
+    <div class="metric-card"><div class="metric-label">Avg trade value</div><div class="metric-val" id="rec-avg">—</div></div>
+  </div>
+  <div class="section-label">Breakdown by asset</div>
+  <div class="card"><div id="rec-breakdown"></div></div>
+  <div class="info-box">📊 These records are your investor pitch data. Every completed trade is documented here.</div>
+  <button class="btn btn-outline" onclick="exportCSV()"><i class="ti ti-file-export"></i> Export as CSV</button>
+</div>
+
+<!-- ══ USER HOME ══ -->
+<div id="user-home" class="page">
+  <div class="topbar">
+    <div id="usr-logo" style="width:130px;"></div>
+    <div class="topbar-actions">
+      <div class="icon-btn" onclick="doLogout()"><i class="ti ti-logout"></i></div>
+    </div>
+  </div>
+  <div style="margin-bottom:16px;">
+    <div style="font-size:13px;color:var(--text-3);">Welcome back</div>
+    <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;" id="user-greeting">—</div>
+  </div>
+  <div id="kyc-banner" style="display:none;" class="warn-box">
+    <i class="ti ti-alert-triangle"></i> Complete KYC to unlock trading. <a onclick="show('user-kyc')" style="color:var(--teal);cursor:pointer;">Verify now →</a>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px;">
+    <button class="btn btn-success" id="buy-btn" onclick="show('user-buy'); calcBuy();"><i class="ti ti-arrow-down-circle"></i> Buy crypto</button>
+    <button class="btn btn-danger"  id="sell-btn" onclick="show('user-sell'); calcSell();"><i class="ti ti-arrow-up-circle"></i> Sell crypto</button>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div class="card-title" style="margin:0;">Live rates</div>
+      <div style="font-size:11px;color:var(--text-3);" id="user-last-updated"></div>
+    </div>
+    <div id="user-rates"></div>
+  </div>
+  <div class="bottom-nav">
+    <div class="bnav-item active" onclick="show('user-home');"><i class="ti ti-home"></i><span>Home</span></div>
+    <div class="bnav-item" onclick="loadUserOrders(); show('user-orders');"><i class="ti ti-receipt"></i><span>Orders</span></div>
+    <div class="bnav-item" onclick="show('user-kyc');"><i class="ti ti-user-check"></i><span>KYC</span></div>
+  </div>
+</div>
+
+<!-- ══ USER BUY ══ -->
+<div id="user-buy" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('user-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Buy crypto</div>
+  </div>
+  <div class="field">
+    <label>Select asset</label>
+    <select id="buy-coin" onchange="calcBuy()">
+      <option value="USDT">USDT — Tether</option>
+      <option value="BTC">BTC — Bitcoin</option>
+      <option value="ETH">ETH — Ethereum</option>
+      <option value="BNB">BNB — BNB Chain</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>Amount you're paying (NGN)</label>
+    <input id="buy-ngn" type="number" placeholder="e.g. 50,000" oninput="calcBuy()">
+  </div>
+  <div class="calc-result">
+    <div class="calc-label">You will receive</div>
+    <div class="calc-val" id="buy-result-val">—</div>
+    <div class="calc-note" id="buy-result-note"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">Payment instructions</div>
+    <div style="font-size:13px;color:var(--text-3);margin-bottom:10px;">Transfer your NGN to:</div>
+    <div style="font-size:15px;font-weight:600;margin-bottom:2px;">Access Bank</div>
+    <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;color:var(--teal);margin-bottom:2px;">0123456789</div>
+    <div style="font-size:13px;color:var(--text-2);">Elite Trading Ltd</div>
+  </div>
+  <div class="warn-box"><i class="ti ti-alert-triangle" style="margin-right:6px;"></i>Crypto is released <strong>only after</strong> your payment is confirmed by admin.</div>
+  <div class="proof-box" onclick="$('buy-proof-input').click()">
+    <i class="ti ti-upload"></i>
+    <p id="buy-proof-label">Tap to upload payment receipt</p>
+    <input type="file" id="buy-proof-input" accept="image/*" style="display:none" onchange="handleProofUpload('buy')">
+  </div>
+  <button class="btn btn-primary" id="buy-submit-btn" onclick="submitBuyOrder()"><i class="ti ti-send"></i> Submit buy order</button>
+</div>
+
+<!-- ══ USER SELL ══ -->
+<div id="user-sell" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('user-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">Sell crypto</div>
+  </div>
+  <div class="field">
+    <label>Select asset to sell</label>
+    <select id="sell-coin" onchange="calcSell()">
+      <option value="USDT">USDT — Tether</option>
+      <option value="BTC">BTC — Bitcoin</option>
+      <option value="ETH">ETH — Ethereum</option>
+      <option value="BNB">BNB — BNB Chain</option>
+    </select>
+  </div>
+  <div class="field">
+    <label>Amount (crypto)</label>
+    <input id="sell-amt" type="number" placeholder="e.g. 100" oninput="calcSell()">
+  </div>
+  <div class="calc-result">
+    <div class="calc-label">You will receive</div>
+    <div class="calc-val" id="sell-result-val">—</div>
+    <div class="calc-note" id="sell-result-note"></div>
+  </div>
+  <div class="field"><label>Your bank account number</label><input id="sell-acct" type="text" placeholder="e.g. 0123456789"></div>
+  <div class="field">
+    <label>Bank name</label>
+    <select id="sell-bank">
+      <option>Access Bank</option><option>GTBank</option><option>First Bank</option>
+      <option>UBA</option><option>Zenith Bank</option><option>Opay</option>
+      <option>Palmpay</option><option>Kuda Bank</option><option>Moniepoint</option>
+    </select>
+  </div>
+  <div class="warn-box"><i class="ti ti-alert-triangle" style="margin-right:6px;"></i>Send crypto to admin wallet first. NGN is released only after receipt is confirmed.</div>
+  <div class="info-box">Admin wallet address will be shared after your order is submitted.</div>
+  <button class="btn btn-primary" onclick="submitSellOrder()"><i class="ti ti-send"></i> Submit sell order</button>
+</div>
+
+<!-- ══ USER ORDERS ══ -->
+<div id="user-orders" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('user-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">My orders</div>
+  </div>
+  <div id="user-orders-list"><div style="font-size:13px;color:var(--text-3);padding:12px 0;">Loading...</div></div>
+</div>
+
+<!-- ══ USER KYC ══ -->
+<div id="user-kyc" class="page">
+  <div class="back-nav">
+    <div class="back-btn" onclick="show('user-home')"><i class="ti ti-arrow-left"></i></div>
+    <div class="back-title">KYC verification</div>
+  </div>
+
+  <div id="kyc-status-banner"></div>
+
+  <!-- Progress dots -->
+  <div class="kyc-progress">
+    <div class="kyc-step-dot active" id="kd1"></div>
+    <div class="kyc-step-dot" id="kd2"></div>
+    <div class="kyc-step-dot" id="kd3"></div>
+    <div class="kyc-step-dot" id="kd4"></div>
+  </div>
+
+  <!-- Step 1: BVN + NIN -->
+  <div id="kyc-step-1">
+    <div class="card">
+      <div class="card-title">Step 1 — Identity details</div>
+      <div class="field"><label>BVN (Bank Verification Number)</label><input id="kyc-bvn" type="text" placeholder="11-digit BVN" maxlength="11" inputmode="numeric"></div>
+      <div class="field"><label>NIN (National Identity Number)</label><input id="kyc-nin" type="text" placeholder="11-digit NIN" maxlength="11" inputmode="numeric"></div>
+    </div>
+    <button class="btn btn-primary" onclick="kycStep1Next()"><i class="ti ti-arrow-right"></i> Continue</button>
+  </div>
+
+  <!-- Step 2: ID document upload -->
+  <div id="kyc-step-2" style="display:none;">
+    <div class="card">
+      <div class="card-title">Step 2 — Government ID</div>
+      <div style="font-size:13px;color:var(--text-2);margin-bottom:14px;">Upload a clear photo of your NIN slip, passport, or driver's licence.</div>
+      <div class="proof-box" onclick="$('kyc-id-input').click()">
+        <i class="ti ti-id-badge" id="kyc-id-icon"></i>
+        <p id="kyc-id-label">Tap to upload your ID document</p>
+        <input type="file" id="kyc-id-input" accept="image/*" style="display:none" onchange="handleIDUpload()">
+      </div>
+    </div>
+    <button class="btn btn-primary" id="kyc-step2-btn" onclick="kycStep2Next()" disabled><i class="ti ti-arrow-right"></i> Continue to face scan</button>
+  </div>
+
+  <!-- Step 3: Facial verification -->
+  <div id="kyc-step-3" style="display:none;">
+    <div class="card" style="margin-bottom:12px;">
+      <div class="card-title">Step 3 — Face verification</div>
+      <div style="font-size:13px;color:var(--text-2);margin-bottom:12px;">Position your face inside the circle. Make sure you're in good lighting.</div>
+    </div>
+    <div class="camera-wrap">
+      <video id="kyc-video" autoplay playsinline muted></video>
+      <canvas id="kyc-canvas"></canvas>
+      <div class="camera-overlay">
+        <div class="face-guide"></div>
+        <div class="camera-hint" id="camera-hint">Centre your face in the circle</div>
+      </div>
+    </div>
+    <div id="camera-countdown" style="text-align:center;font-family:'Syne',sans-serif;font-size:48px;font-weight:700;color:var(--teal);display:none;margin-bottom:12px;"></div>
+    <button class="btn btn-primary" id="capture-btn" onclick="startFaceCapture()"><i class="ti ti-camera"></i> Scan my face</button>
+    <button class="btn btn-ghost" style="margin-top:8px;" onclick="stopCamera(); kycShowStep(2)"><i class="ti ti-arrow-left"></i> Go back</button>
+  </div>
+
+  <!-- Step 4: Review & submit -->
+  <div id="kyc-step-4" style="display:none;">
+    <div class="success-box">
+      <i class="ti ti-circle-check" style="font-size:32px;display:block;margin-bottom:8px;"></i>
+      Face captured successfully!
+    </div>
+    <div class="card">
+      <div class="card-title">Step 4 — Review & submit</div>
+      <div class="step-row"><div class="step-num done"><i class="ti ti-check"></i></div><div><div class="step-label">BVN & NIN</div><div class="step-sub" id="kyc-review-bvn"></div></div></div>
+      <div class="step-row"><div class="step-num done"><i class="ti ti-check"></i></div><div><div class="step-label">Government ID</div><div class="step-sub">Document uploaded</div></div></div>
+      <div class="step-row"><div class="step-num done"><i class="ti ti-check"></i></div><div><div class="step-label">Face verification</div><div class="step-sub">Selfie captured</div></div></div>
+    </div>
+    <button class="btn btn-primary" id="kyc-submit-btn" onclick="submitKYC()"><i class="ti ti-send"></i> Submit for review</button>
+  </div>
+
+</div>
+
+</div><!-- /app -->
+
+<script>
+// ══════════════════════════════════════
+// CONFIG & SUPABASE
+// ══════════════════════════════════════
+const ADMIN_EMAIL    = 'larridzekk@gmail.com';
+const ADMIN_PASSWORD = 'coleK1D$ig#';
+let supabase = null;
+
+function getConfig() {
+  try { return JSON.parse(localStorage.getItem('et_config') || 'null'); } catch { return null; }
+}
+function saveConfig(url, key) {
+  localStorage.setItem('et_config', JSON.stringify({ url, key }));
+}
+
+function initSupabase(url, key) {
+  try {
+    supabase = window.supabase.createClient(url, key);
+    return true;
+  } catch(e) { return false; }
+}
+
+async function saveSupabaseConfig() {
+  const url = $('sb-url').value.trim();
+  const key = $('sb-key').value.trim();
+  const err = $('setup-err');
+  if (!url || !key) { err.textContent = 'Please fill both fields.'; return; }
+  if (!url.includes('supabase.co')) { err.textContent = 'Please enter a valid Supabase URL.'; return; }
+  err.textContent = 'Connecting...';
+  if (!initSupabase(url, key)) { err.textContent = 'Connection failed. Check your keys.'; return; }
+  try {
+    const { error } = await supabase.from('profiles').select('id').limit(1);
+    if (error && error.code !== 'PGRST116') throw error;
+    saveConfig(url, key);
+    err.textContent = '';
+    toast('✓ Connected to Supabase!');
+    setTimeout(() => show('login'), 800);
+  } catch(e) {
+    err.textContent = 'Could not connect. Make sure you ran the SQL schema first.';
+  }
+}
+
+function copySQL() {
+  const sql = document.querySelector('.card div[style*="monospace"]').textContent;
+  navigator.clipboard.writeText(sql).then(() => toast('SQL copied ✓'));
+}
+
+// ══════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════
+const USD_NGN = 1620;
+const $ = id => document.getElementById(id);
+const fmtNGN = n => '₦' + Math.round(n).toLocaleString('en-NG');
+const fmtTime = ts => new Date(ts).toLocaleString('en-NG', {day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+
+let SPREAD = 2;
+let PRICES = { USDT:1, BTC:97000, ETH:3500, BNB:680 };
+const buyRate  = c => PRICES[c] * USD_NGN * (1 - SPREAD/100);
+const sellRate = c => PRICES[c] * USD_NGN * (1 + SPREAD/100);
+
+function toast(msg, dur=2800) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), dur);
+}
+function show(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = $(pageId); if (el) { el.classList.add('active'); window.scrollTo(0,0); }
+}
+function setLoading(btnId, loading, text='') {
+  const btn = $(btnId); if (!btn) return;
+  btn.disabled = loading;
+  if (text) btn.innerHTML = loading ? `<span class="pulse">${text}</span>` : text;
+}
+
+// ══════════════════════════════════════
+// LOGO
+// ══════════════════════════════════════
+function logoSVG(w=140) {
+  return `<svg width="${w}" viewBox="0 0 310 130" xmlns="http://www.w3.org/2000/svg">
+    <rect x="4" y="14" width="8" height="82" fill="#00D9B0"/>
+    <rect x="4" y="14" width="46" height="8" fill="#00D9B0"/>
+    <rect x="4" y="53" width="34" height="8" fill="#00D9B0"/>
+    <rect x="4" y="88" width="46" height="8" fill="#00D9B0"/>
+    <rect x="50" y="14" width="30" height="8" fill="white" opacity=".9"/>
+    <rect x="65" y="22" width="8" height="44" fill="white" opacity=".9"/>
+    <text x="92" y="72" font-family="'Arial Black',Arial,sans-serif" font-size="46" font-weight="900" fill="white" dominant-baseline="middle" letter-spacing="-1">ELITE</text>
+    <text x="92" y="106" font-family="Arial,sans-serif" font-size="18" font-weight="700" fill="#00D9B0" letter-spacing="7">TRADING</text>
+    <line x1="92" y1="115" x2="306" y2="115" stroke="#00D9B0" stroke-width=".7" opacity=".2"/>
+    <text x="92" y="127" font-family="sans-serif" font-size="9" fill="#00D9B0" opacity=".5" letter-spacing="3.5">CRYPTO EXCHANGE</text>
+  </svg>`;
+}
+function stampLogos() {
+  ['splash-logo','setup-logo','login-logo','reg-logo','adm-logo','usr-logo'].forEach(id => {
+    const el = $(id); if (el) el.innerHTML = logoSVG(id==='splash-logo'?220:140);
+  });
+}
+
+// ══════════════════════════════════════
+// PRICES
+// ══════════════════════════════════════
+const COINS = {
+  USDT:{sym:'₮',cls:'ci-usdt',name:'Tether'},
+  BTC:{sym:'₿',cls:'ci-btc',name:'Bitcoin'},
+  ETH:{sym:'Ξ',cls:'ci-eth',name:'Ethereum'},
+  BNB:{sym:'B',cls:'ci-bnb',name:'BNB Chain'},
+};
+function rateRowHTML(c) {
+  return `<div class="rate-row">
+    <div class="coin-pill">
+      <div class="coin-icon ${COINS[c].cls}">${COINS[c].sym}</div>
+      <div><div class="coin-name">${c}</div><div class="coin-sub">${COINS[c].name}</div></div>
+    </div>
+    <div class="rate-prices">
+      <div class="rate-buy">Buy ${fmtNGN(buyRate(c))}</div>
+      <div class="rate-sell">Sell ${fmtNGN(sellRate(c))}</div>
+    </div>
+  </div>`;
+}
+function renderRates(elId) {
+  const el = $(elId); if(el) el.innerHTML = Object.keys(COINS).map(rateRowHTML).join('');
+}
+async function fetchPrices() {
+  try {
+    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,binancecoin,tether&vs_currencies=usd');
+    const d = await r.json();
+    PRICES.BTC  = d.bitcoin?.usd     || PRICES.BTC;
+    PRICES.ETH  = d.ethereum?.usd    || PRICES.ETH;
+    PRICES.BNB  = d.binancecoin?.usd || PRICES.BNB;
+    PRICES.USDT = d.tether?.usd      || 1;
+    const t = new Date().toLocaleTimeString('en-NG',{hour:'2-digit',minute:'2-digit'});
+    ['last-updated','user-last-updated'].forEach(id => { const el=$(id); if(el) el.textContent='Updated '+t; });
+    renderRates('admin-rates'); renderRates('user-rates');
+    renderSpreadPreview();
+  } catch { renderRates('admin-rates'); renderRates('user-rates'); }
+}
+
+// ══════════════════════════════════════
+// AUTH
+// ══════════════════════════════════════
+let CURRENT_USER = null;
+
+async function doLogin() {
+  const email = $('login-email').value.trim().toLowerCase();
+  const pass  = $('login-pass').value;
+  const err   = $('login-err');
+  if (!email||!pass) { err.textContent='Please fill all fields.'; return; }
+  setLoading('login-btn', true, '<i class="ti ti-loader pulse"></i> Signing in...');
+  err.textContent = '';
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password: pass });
+    if (error) throw error;
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', data.user.id).single();
+    CURRENT_USER = { ...data.user, ...profile };
+    afterLogin();
+  } catch(e) {
+    err.textContent = e.message || 'Invalid email or password.';
+    setLoading('login-btn', false, '<i class="ti ti-login"></i> Sign in');
+  }
+}
+
+async function doRegister() {
+  const name  = $('reg-name').value.trim();
+  const email = $('reg-email').value.trim().toLowerCase();
+  const pass  = $('reg-pass').value;
+  const pass2 = $('reg-pass2').value;
+  const err   = $('reg-err');
+  if (!name||!email||!pass||!pass2) { err.textContent='Please fill all fields.'; return; }
+  if (pass !== pass2) { err.textContent='Passwords do not match.'; return; }
+  if (pass.length < 6) { err.textContent='Password must be at least 6 characters.'; return; }
+  setLoading('reg-btn', true, '<i class="ti ti-loader pulse"></i> Creating account...');
+  err.textContent = '';
+  try {
+    const { data, error } = await supabase.auth.signUp({ email, password: pass });
+    if (error) throw error;
+    await supabase.from('profiles').insert({
+      id: data.user.id, full_name: name, email,
+      role: email === ADMIN_EMAIL ? 'admin' : 'user',
+      kyc_status: 'pending'
+    });
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', data.user.id).single();
+    CURRENT_USER = { ...data.user, ...profile };
+    toast('✓ Account created! Welcome to Elite Trading.');
+    afterLogin();
+  } catch(e) {
+    err.textContent = e.message || 'Registration failed. Please try again.';
+    setLoading('reg-btn', false, '<i class="ti ti-user-plus"></i> Create account');
+  }
+}
+
+function afterLogin() {
+  fetchPrices();
+  setInterval(fetchPrices, 60000);
+  if (CURRENT_USER.role === 'admin') {
+    loadAdminHome(); show('admin-home');
+  } else {
+    $('user-greeting').textContent = 'Good day, ' + (CURRENT_USER.full_name||'').split(' ')[0];
+    const kycBanner = $('kyc-banner');
+    if (CURRENT_USER.kyc_status !== 'approved') {
+      kycBanner.style.display = 'block';
+    }
+    show('user-home');
+  }
+}
+
+async function doLogout() {
+  await supabase?.auth.signOut();
+  CURRENT_USER = null;
+  show('login');
+}
+
+// ══════════════════════════════════════
+// ADMIN — HOME
+// ══════════════════════════════════════
+async function loadAdminHome() {
+  renderRates('admin-rates');
+  $('adm-spread').textContent = SPREAD + '%';
+  try {
+    const { data: orders } = await supabase.from('orders').select('status,ngn_amount');
+    const pending = orders?.filter(o=>o.status==='pending').length || 0;
+    const vol     = orders?.reduce((s,o)=>s+(o.ngn_amount||0),0) || 0;
+    $('adm-orders').textContent  = orders?.length || 0;
+    $('adm-pending').textContent = pending;
+    $('adm-volume').textContent  = fmtNGN(vol);
+    if (pending > 0) $('notif-dot').style.display='block';
+    const { data: users } = await supabase.from('profiles').select('kyc_status');
+    const kycPend = users?.filter(u=>u.kyc_status==='pending').length || 0;
+    if ($('adm-registered')) $('adm-registered').textContent = users?.length || 0;
+    if ($('adm-kyc-pending')) $('adm-kyc-pending').textContent = kycPend;
+  } catch(e) {
+    $('adm-orders').textContent='—'; $('adm-pending').textContent='—'; $('adm-volume').textContent='—';
+  }
+}
+
+// ══════════════════════════════════════
+// ADMIN — ORDERS
+// ══════════════════════════════════════
+let ALL_ADMIN_ORDERS = [];
+async function loadAdminOrders() {
+  $('admin-orders-list').innerHTML = '<div style="font-size:13px;color:var(--text-3);padding:12px 0;">Loading...</div>';
+  const { data, error } = await supabase.from('orders').select('*').order('created_at',{ascending:false});
+  ALL_ADMIN_ORDERS = data || [];
+  filterAdminOrders('all', document.querySelector('.tab-btn'));
+}
+function filterAdminOrders(status, tab) {
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if(tab) tab.classList.add('active');
+  const list = status==='all' ? ALL_ADMIN_ORDERS : ALL_ADMIN_ORDERS.filter(o=>o.status===status);
+  $('admin-orders-list').innerHTML = list.length
+    ? list.map(o=>`
+      <div class="order-item fade-up" onclick="openOrderDetail('${o.id}')">
+        <div class="order-head">
+          <div><div class="order-title">${o.type} ${o.amount} ${o.coin}</div><div class="order-meta">${fmtTime(o.created_at)} · ${fmtNGN(o.ngn_amount)}</div></div>
+          <span class="badge b-${o.status}">${o.status}</span>
+        </div>
+        <div class="order-user">${o.user_name} · ${o.user_email}</div>
+      </div>`).join('')
+    : '<p style="font-size:13px;color:var(--text-3);padding:12px 0;">No orders found.</p>';
+}
+function openOrderDetail(id) {
+  const o = ALL_ADMIN_ORDERS.find(x=>x.id===id);
+  $('od-title').textContent  = `${o.type} ${o.amount} ${o.coin}`;
+  $('od-badge').className    = `badge b-${o.status}`;
+  $('od-badge').textContent  = o.status;
+  $('od-user').textContent   = o.user_name;
+  $('od-email').textContent  = o.user_email;
+  $('od-amount').textContent = fmtNGN(o.ngn_amount);
+  $('od-rate').textContent   = fmtNGN(o.rate) + ' per ' + o.coin;
+  $('od-time').textContent   = fmtTime(o.created_at);
+  const pw = $('od-proof-wrap');
+  if (o.proof_url) {
+    pw.innerHTML = `<img src="${o.proof_url}" style="width:100%;border-radius:8px;display:block;">`;
+  } else {
+    pw.innerHTML = `<i class="ti ti-file-description" style="font-size:36px;color:var(--text-3);display:block;margin-bottom:8px;"></i><div style="font-size:13px;color:var(--text-2);">No proof uploaded</div>`;
+  }
+  const actions = $('od-actions');
+  actions.innerHTML = o.status==='pending'
+    ? `<button class="btn btn-success" onclick="updateOrderStatus('${o.id}','completed')"><i class="ti ti-check"></i> Confirm payment</button>
+       <button class="btn btn-danger btn-sm" style="width:auto;padding:13px 16px;" onclick="updateOrderStatus('${o.id}','rejected')"><i class="ti ti-x"></i></button>`
+    : `<p style="font-size:13px;color:var(--text-3);">Order ${o.status}.</p>`;
+  show('admin-order-detail');
+}
+async function updateOrderStatus(id, status) {
+  await supabase.from('orders').update({ status }).eq('id', id);
+  toast(status==='completed' ? '✓ Payment confirmed.' : 'Order rejected.');
+  loadAdminOrders(); show('admin-orders');
+}
+
+// ══════════════════════════════════════
+// ADMIN — USERS
+// ══════════════════════════════════════
+async function loadAdminUsers() {
+  const { data } = await supabase.from('profiles').select('*').order('created_at',{ascending:false});
+  const users = data || [];
+  $('adm-registered').textContent  = users.length;
+  $('adm-kyc-pending').textContent = users.filter(u=>u.kyc_status==='pending').length;
+  $('users-list').innerHTML = users.length
+    ? users.map(u=>`
+      <div class="user-row">
+        <div>
+          <div class="user-name">${u.full_name||'—'}</div>
+          <div class="user-sub">${u.email}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+          <span class="badge b-${u.kyc_status==='approved'?'approved':'pending'}">${u.kyc_status}</span>
+          ${u.kyc_status==='pending'?`<button class="btn btn-success btn-sm" onclick="approveKYC('${u.id}')">Approve</button>`:''}
+        </div>
+      </div>`).join('')
+    : '<p style="font-size:13px;color:var(--text-3);padding:8px 0;">No users yet.</p>';
+}
+async function approveKYC(userId) {
+  await supabase.from('profiles').update({ kyc_status:'approved' }).eq('id', userId);
+  toast('✓ KYC approved.'); loadAdminUsers();
+}
+
+// ══════════════════════════════════════
+// ADMIN — RECORDS
+// ══════════════════════════════════════
+async function loadAdminRecords() {
+  const { data } = await supabase.from('orders').select('*').eq('status','completed');
+  const orders = data || [];
+  const vol = orders.reduce((s,o)=>s+(o.ngn_amount||0),0);
+  const est = vol * SPREAD / 100;
+  $('rec-vol').textContent    = fmtNGN(vol);
+  $('rec-trades').textContent = orders.length;
+  $('rec-earn').textContent   = fmtNGN(est);
+  $('rec-avg').textContent    = orders.length ? fmtNGN(vol/orders.length) : '₦0';
+  const byAsset = {};
+  orders.forEach(o => { byAsset[o.coin]=(byAsset[o.coin]||0)+1; });
+  $('rec-breakdown').innerHTML = Object.entries(byAsset).map(([c,n])=>`
+    <div class="rate-row" style="padding:8px 0;">
+      <span style="font-size:13px;color:var(--text-2);">${c} trades</span>
+      <span style="font-size:14px;font-weight:600;">${n}</span>
+    </div>`).join('') || '<p style="font-size:13px;color:var(--text-3);">No completed trades yet.</p>';
+}
+function exportCSV() {
+  if (!ALL_ADMIN_ORDERS.length) { toast('No orders to export yet.'); return; }
+  const header = 'ID,User,Email,Type,Coin,Amount,NGN,Status,Date\n';
+  const rows = ALL_ADMIN_ORDERS.map(o=>
+    `${o.id},${o.user_name},${o.user_email},${o.type},${o.coin},${o.amount},${o.ngn_amount},${o.status},${fmtTime(o.created_at)}`
+  ).join('\n');
+  const blob = new Blob([header+rows], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'elite-trading-records.csv';
+  a.click();
+  toast('✓ CSV exported');
+}
+
+// ══════════════════════════════════════
+// ADMIN — SPREAD
+// ══════════════════════════════════════
+function updateSpread() {
+  SPREAD = parseFloat($('spread-val').value) || 2;
+  $('spread-display').textContent = SPREAD + '%';
+  renderSpreadPreview();
+}
+function renderSpreadPreview() {
+  const el = $('spread-preview'); if(!el) return;
+  el.innerHTML = Object.keys(COINS).map(c=>`
+    <div class="card" style="margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-weight:600;">${c}</span>
+        <span style="font-size:12px;color:var(--text-3);">Market: ${fmtNGN(PRICES[c]*USD_NGN)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:8px;">
+        <span style="font-size:13px;color:var(--teal);">Buy: ${fmtNGN(buyRate(c))}</span>
+        <span style="font-size:13px;color:var(--danger);">Sell: ${fmtNGN(sellRate(c))}</span>
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════
+// USER — BUY / SELL
+// ══════════════════════════════════════
+let BUY_PROOF_FILE = null;
+function handleProofUpload(type) {
+  const input = $(`${type}-proof-input`);
+  if (input.files[0]) {
+    BUY_PROOF_FILE = input.files[0];
+    $(`${type}-proof-label`).textContent = '✓ ' + input.files[0].name;
+  }
+}
+function calcBuy() {
+  const coin = $('buy-coin').value;
+  const ngn  = parseFloat($('buy-ngn').value) || 0;
+  const rate = sellRate(coin);
+  if (ngn > 0 && rate > 0) {
+    const amt = ngn / rate;
+    $('buy-result-val').textContent  = (amt<0.001?amt.toFixed(8):amt.toFixed(6)) + ' ' + coin;
+    $('buy-result-note').textContent = `Rate: ${fmtNGN(rate)} per ${coin}`;
+  } else {
+    $('buy-result-val').textContent = '—';
+    $('buy-result-note').textContent = '';
+  }
+}
+function calcSell() {
+  const coin = $('sell-coin').value;
+  const amt  = parseFloat($('sell-amt').value) || 0;
+  const rate = buyRate(coin);
+  if (amt > 0 && rate > 0) {
+    $('sell-result-val').textContent  = fmtNGN(amt * rate);
+    $('sell-result-note').textContent = `Rate: ${fmtNGN(rate)} per ${coin}`;
+  } else {
+    $('sell-result-val').textContent = '—';
+    $('sell-result-note').textContent = '';
+  }
+}
+async function submitBuyOrder() {
+  if (!CURRENT_USER) return;
+  const coin = $('buy-coin').value;
+  const ngn  = parseFloat($('buy-ngn').value) || 0;
+  if (!ngn) { toast('Please enter an amount.'); return; }
+  setLoading('buy-submit-btn', true, '<i class="ti ti-loader pulse"></i> Submitting...');
+  const rate = sellRate(coin);
+  const amount = ngn / rate;
+  let proof_url = null;
+  if (BUY_PROOF_FILE) {
+    const path = `proofs/${CURRENT_USER.id}/${Date.now()}.jpg`;
+    const { data } = await supabase.storage.from('proofs').upload(path, BUY_PROOF_FILE);
+    if (data) {
+      const { data: url } = supabase.storage.from('proofs').getPublicUrl(path);
+      proof_url = url.publicUrl;
+    }
+  }
+  const { error } = await supabase.from('orders').insert({
+    user_id: CURRENT_USER.id,
+    user_name: CURRENT_USER.full_name,
+    user_email: CURRENT_USER.email,
+    type: 'Buy', coin,
+    amount: parseFloat(amount.toFixed(8)),
+    ngn_amount: Math.round(ngn),
+    rate: Math.round(rate),
+    proof_url, status: 'pending'
+  });
+  setLoading('buy-submit-btn', false, '<i class="ti ti-send"></i> Submit buy order');
+  if (error) { toast('Failed to submit. Try again.'); return; }
+  BUY_PROOF_FILE = null;
+  $('buy-proof-label').textContent = 'Tap to upload payment receipt';
+  $('buy-ngn').value = '';
+  $('buy-result-val').textContent = '—';
+  toast('✓ Order submitted. Awaiting confirmation.');
+  loadUserOrders(); show('user-orders');
+}
+async function submitSellOrder() {
+  if (!CURRENT_USER) return;
+  const coin  = $('sell-coin').value;
+  const amt   = parseFloat($('sell-amt').value) || 0;
+  const acct  = $('sell-acct').value.trim();
+  const bank  = $('sell-bank').value;
+  if (!amt)  { toast('Please enter an amount.'); return; }
+  if (!acct) { toast('Please enter your bank account number.'); return; }
+  const rate = buyRate(coin);
+  const { error } = await supabase.from('orders').insert({
+    user_id: CURRENT_USER.id,
+    user_name: CURRENT_USER.full_name,
+    user_email: CURRENT_USER.email,
+    type: 'Sell', coin, amount: amt,
+    ngn_amount: Math.round(amt * rate),
+    rate: Math.round(rate),
+    bank_name: bank, account_number: acct,
+    status: 'pending'
+  });
+  if (error) { toast('Failed to submit. Try again.'); return; }
+  $('sell-amt').value = '';
+  $('sell-result-val').textContent = '—';
+  toast('✓ Sell order submitted. Admin will contact you.');
+  loadUserOrders(); show('user-orders');
+}
+async function loadUserOrders() {
+  if (!CURRENT_USER) return;
+  $('user-orders-list').innerHTML = '<div style="font-size:13px;color:var(--text-3);padding:12px 0;">Loading...</div>';
+  const { data } = await supabase.from('orders').select('*').eq('user_id', CURRENT_USER.id).order('created_at',{ascending:false});
+  const orders = data || [];
+  $('user-orders-list').innerHTML = orders.length
+    ? orders.map(o=>`
+      <div class="order-item fade-up">
+        <div class="order-head">
+          <div><div class="order-title">${o.type} ${o.amount} ${o.coin}</div><div class="order-meta">${fmtTime(o.created_at)} · ${fmtNGN(o.ngn_amount)}</div></div>
+          <span class="badge b-${o.status}">${o.status}</span>
+        </div>
+        <div class="order-user" style="color:${o.status==='completed'?'var(--teal)':o.status==='rejected'?'var(--danger)':'var(--text-3)'}">
+          ${o.status==='completed'?'✓ Completed — crypto released':o.status==='rejected'?'✗ Rejected':'Awaiting admin confirmation'}
+        </div>
+      </div>`).join('')
+    : '<p style="font-size:13px;color:var(--text-3);padding:12px 0;">No orders yet. Place your first trade!</p>';
+}
+
+// ══════════════════════════════════════
+// KYC — FACIAL VERIFICATION
+// ══════════════════════════════════════
+let kycData = { bvn:'', nin:'', idFile:null, selfieBlob:null };
+let videoStream = null;
+
+function kycShowStep(n) {
+  [1,2,3,4].forEach(i => {
+    const el = $(`kyc-step-${i}`); if(el) el.style.display = i===n?'block':'none';
+    const dot = $(`kd${i}`);
+    if(dot) { dot.className='kyc-step-dot'; if(i<n) dot.classList.add('done'); if(i===n) dot.classList.add('active'); }
+  });
+}
+
+function kycStep1Next() {
+  const bvn = $('kyc-bvn').value.trim();
+  const nin = $('kyc-nin').value.trim();
+  if (bvn.length !== 11 || !/^\d+$/.test(bvn)) { toast('Please enter a valid 11-digit BVN.'); return; }
+  if (nin.length !== 11 || !/^\d+$/.test(nin))  { toast('Please enter a valid 11-digit NIN.'); return; }
+  kycData.bvn = bvn; kycData.nin = nin;
+  kycShowStep(2);
+}
+
+function handleIDUpload() {
+  const file = $('kyc-id-input').files[0];
+  if (!file) return;
+  kycData.idFile = file;
+  $('kyc-id-label').textContent = '✓ ' + file.name;
+  $('kyc-id-icon').className = 'ti ti-circle-check';
+  $('kyc-id-icon').style.color = 'var(--teal)';
+  $('kyc-step2-btn').disabled = false;
+}
+
+function kycStep2Next() {
+  kycShowStep(3);
+  startCamera();
+}
+
+async function startCamera() {
+  try {
+    videoStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode:'user', width:{ideal:640}, height:{ideal:480} },
+      audio: false
+    });
+    $('kyc-video').srcObject = videoStream;
+    $('camera-hint').textContent = 'Centre your face in the circle';
+    $('capture-btn').disabled = false;
+  } catch(e) {
+    toast('Camera access denied. Please allow camera and try again.');
+    $('camera-hint').textContent = 'Camera access required for face verification.';
+    $('capture-btn').disabled = true;
+  }
+}
+
+function stopCamera() {
+  if (videoStream) { videoStream.getTracks().forEach(t=>t.stop()); videoStream = null; }
+}
+
+function startFaceCapture() {
+  $('capture-btn').disabled = true;
+  $('camera-hint').textContent = 'Hold still...';
+  const countdown = $('camera-countdown');
+  countdown.style.display = 'block';
+  let count = 3;
+  countdown.textContent = count;
+  const interval = setInterval(() => {
+    count--;
+    if (count > 0) {
+      countdown.textContent = count;
+    } else {
+      clearInterval(interval);
+      countdown.style.display = 'none';
+      captureSelfie();
+    }
+  }, 1000);
+}
+
+function captureSelfie() {
+  const video  = $('kyc-video');
+  const canvas = $('kyc-canvas');
+  canvas.width  = video.videoWidth  || 640;
+  canvas.height = video.videoHeight || 480;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  canvas.toBlob(blob => {
+    kycData.selfieBlob = blob;
+    stopCamera();
+    $('camera-hint').textContent = '✓ Face captured!';
+    $('kyc-review-bvn').textContent = `BVN: ****${kycData.bvn.slice(-4)} · NIN: ****${kycData.nin.slice(-4)}`;
+    kycShowStep(4);
+    toast('✓ Face scan complete!');
+  }, 'image/jpeg', 0.85);
+}
+
+async function submitKYC() {
+  if (!CURRENT_USER) return;
+  setLoading('kyc-submit-btn', true, '<i class="ti ti-loader pulse"></i> Submitting...');
+  try {
+    const uid = CURRENT_USER.id;
+    let idUrl = null, selfieUrl = null;
+
+    if (kycData.idFile) {
+      const path = `kyc/${uid}/id_doc.jpg`;
+      await supabase.storage.from('kyc-docs').upload(path, kycData.idFile, {upsert:true});
+      const { data:u } = supabase.storage.from('kyc-docs').getPublicUrl(path);
+      idUrl = u.publicUrl;
+    }
+    if (kycData.selfieBlob) {
+      const path = `kyc/${uid}/selfie.jpg`;
+      await supabase.storage.from('kyc-docs').upload(path, kycData.selfieBlob, {upsert:true});
+      const { data:u } = supabase.storage.from('kyc-docs').getPublicUrl(path);
+      selfieUrl = u.publicUrl;
+    }
+
+    await supabase.from('profiles').update({
+      kyc_bvn: kycData.bvn,
+      kyc_nin: kycData.nin,
+      kyc_id_url: idUrl,
+      kyc_selfie_url: selfieUrl,
+      kyc_status: 'pending'
+    }).eq('id', uid);
+
+    $('kyc-status-banner').innerHTML = `<div class="success-box"><i class="ti ti-circle-check" style="font-size:24px;display:block;margin-bottom:6px;"></i>KYC submitted! You'll be notified once approved (usually within 24 hours).</div>`;
+    $('kyc-banner').style.display = 'none';
+    toast('✓ KYC submitted for review.');
+    setLoading('kyc-submit-btn', false, '<i class="ti ti-check"></i> Submitted');
+    $('kyc-submit-btn').disabled = true;
+  } catch(e) {
+    toast('Submission failed. Please try again.');
+    setLoading('kyc-submit-btn', false, '<i class="ti ti-send"></i> Submit for review');
+  }
+}
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  stampLogos();
+
+  // Splash
+  let pct = 0;
+  const bar = $('splash-fill');
+  const si = setInterval(() => {
+    pct += 2; if(bar) bar.style.width = pct+'%';
+    if (pct >= 100) {
+      clearInterval(si);
+      setTimeout(() => {
+        $('splash').classList.add('hide');
+        const cfg = getConfig();
+        if (cfg && initSupabase(cfg.url, cfg.key)) {
+          // Check existing session
+          supabase.auth.getSession().then(async ({ data }) => {
+            if (data.session) {
+              const { data: profile } = await supabase.from('profiles').select('*').eq('id', data.session.user.id).single();
+              CURRENT_USER = { ...data.session.user, ...profile };
+              afterLogin();
+            } else {
+              show('login');
+            }
+          });
+        } else {
+          show('setup');
+        }
+      }, 300);
+    }
+  }, 40);
+
+  kycShowStep(1);
+});
+</script>
+</body>
+</html>
